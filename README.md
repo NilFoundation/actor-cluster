@@ -1,3 +1,4 @@
+# =nil; Actor
 [![Licence](https://img.shields.io/github/license/HippoBaro/ultramarine.svg?color=%23120a8f&style=for-the-badge)](https://github.com/nilfoundation/actor-cluster/blob/master/LICENSE)
 
 =nil; Actor is a lightweight modern actor library built on top of the [=nil; Actor.Core Library](https://github.com/nilfoundation/actor-core). It helps writing distributed applications using virtual actors. It allows developers to write highly scalable applications while greatly simplifying discovery, state management, actor lifetime and more.
