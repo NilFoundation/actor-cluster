@@ -24,7 +24,7 @@
 
 #include <nil/actor/actor_ref.hpp>
 #include <nil/actor/actor.hpp>
-#include <seastar/testing/thread_test_case.hh>
+#include <nil/actor/testing/thread_test_case.hh>
 
 class error_actor : public nil::actor::actor<error_actor> {
 public:

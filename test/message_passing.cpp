@@ -23,8 +23,8 @@
  */
 
 #include <numeric>
-#include <seastar/testing/thread_test_case.hh>
-#include <seastar/core/thread.hh>
+#include <nil/actor/testing/thread_test_case.hh>
+#include <nil/actor/core/thread.hh>
 #include <nil/actor/actor.hpp>
 #include <nil/actor/actor_ref.hpp>
 
