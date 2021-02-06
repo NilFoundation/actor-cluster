@@ -56,9 +56,9 @@ namespace nil::actor {
 
             constexpr collocated_actor_ref(collocated_actor_ref &&) noexcept = default;
 
-            inline constexpr typename Actor::internal::template interface<collocated_actor_ref<Actor>>
+            inline constexpr typename Actor::detail::template interface<collocated_actor_ref<Actor>>
                 operator->() const {
-                return typename Actor::internal::template interface<collocated_actor_ref<Actor>> {*this};
+                return typename Actor::detail::template interface<collocated_actor_ref<Actor>> {*this};
             }
 
             template<typename Handler, typename... Args>

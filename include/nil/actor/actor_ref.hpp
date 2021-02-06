@@ -80,8 +80,8 @@ namespace nil::actor {
         /// Provides an intuitive function call-like API.
         /// The syntax `ref->msg(args...)` is equivalent to `ref.tell(actor::message::msg, args...)` but shorter.
         /// \returns Returns the remote actor's interface
-        inline constexpr typename Actor::internal::template interface<actor_ref<Actor>> operator->() const {
-            return typename Actor::internal::template interface<actor_ref<Actor>> {*this};
+        inline constexpr typename Actor::detail::template interface<actor_ref<Actor>> operator->() const {
+            return typename Actor::detail::template interface<actor_ref<Actor>> {*this};
         }
 
         /// Enqueue a message to the [nil::actor::actor]() referenced by this [nil::actor::actor_ref]() instance
@@ -150,8 +150,8 @@ namespace nil::actor {
         /// Provides an intuitive function call-like API.
         /// The syntax `ref->msg(args...)` is equivalent to `ref.tell(actor::message::msg, args...)` but shorter.
         /// \returns Returns the remote actor's interface
-        inline constexpr typename Actor::internal::template interface<actor_ref<Actor>> operator->() const {
-            return typename Actor::internal::template interface<actor_ref<Actor>> {*this};
+        inline constexpr typename Actor::detail::template interface<actor_ref<Actor>> operator->() const {
+            return typename Actor::detail::template interface<actor_ref<Actor>> {*this};
         }
 
         /// Enqueue a message to the [nil::actor::actor]() referenced by this [nil::actor::actor_ref]() instance

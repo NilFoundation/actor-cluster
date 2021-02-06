@@ -115,5 +115,5 @@ public:                                                                         
             ULTRAMARINE_REMOTE_MAKE_VTABLE(name, seq)                                                               \
         };                                                                                                          \
     };                                                                                                              \
-    using message = internal::message; /* FIXME: workaround */\
+    using message = detail::message; /* FIXME: workaround */\
 

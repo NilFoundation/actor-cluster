@@ -50,9 +50,9 @@ namespace nil::actor {
 
                 constexpr remote_actor_ref(remote_actor_ref &&) noexcept = default;
 
-                inline constexpr typename Actor::internal::template interface<remote_actor_ref<Actor>>
+                inline constexpr typename Actor::detail::template interface<remote_actor_ref<Actor>>
                     operator->() const {
-                    return typename Actor::internal::template interface<remote_actor_ref<Actor>> {*this};
+                    return typename Actor::detail::template interface<remote_actor_ref<Actor>> {*this};
                 }
 
                 template<typename Handler, typename... Args>

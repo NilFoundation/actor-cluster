@@ -60,7 +60,7 @@ namespace nil::actor {
 
         template<typename Actor>
         struct vtable {
-            static constexpr auto table = Actor::internal::message::make_vtable();
+            static constexpr auto table = Actor::detail::message::make_vtable();
         };
 
         template<typename... T>

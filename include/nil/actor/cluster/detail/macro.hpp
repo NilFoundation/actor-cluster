@@ -32,7 +32,7 @@
 
 /// \exclude
 #define ULTRAMARINE_MAKE_REMOTE_ENDPOINT(a, data, i, name) \
-    nil::actor::cluster::detail::register_remote_endpoint<data, KeyType>(&data::name, internal::message::name());
+    nil::actor::cluster::detail::register_remote_endpoint<data, KeyType>(&data::name, detail::message::name());
 
 /// \exclude
 #define ULTRAMARINE_REMOTE_MAKE_VTABLE(name, seq)                             \
