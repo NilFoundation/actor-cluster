@@ -81,19 +81,19 @@ using namespace nil::actor;
  * Local
  */
 
-SEASTAR_THREAD_TEST_CASE(key_value_rvref_litteral_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_rvref_litteral_preserved) {
     auto counterActor = nil::actor::get<string_actor>("test-actor-string-key");
 
     BOOST_CHECK(counterActor.tell(string_actor::message::get_key()).get0() == "test-actor-string-key");
 }
 
-SEASTAR_THREAD_TEST_CASE(key_value_rvref_string_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_rvref_string_preserved) {
     auto counterActor = nil::actor::get<string_actor>(std::string("test-actor-string-key"));
 
     BOOST_CHECK(counterActor.tell(string_actor::message::get_key()).get0() == "test-actor-string-key");
 }
 
-SEASTAR_THREAD_TEST_CASE(key_value_lvref_litteral_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_lvref_litteral_preserved) {
     auto key = "test-actor-string-key";
     auto counterActor = nil::actor::get<string_actor>(key);
     key = "test-actor-string-key2";
@@ -101,7 +101,7 @@ SEASTAR_THREAD_TEST_CASE(key_value_lvref_litteral_preserved) {
     BOOST_CHECK(counterActor.tell(string_actor::message::get_key()).get0() == "test-actor-string-key");
 }
 
-SEASTAR_THREAD_TEST_CASE(key_value_lvref_string_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_lvref_string_preserved) {
     auto key = std::string("test-actor-string-key");
     auto counterActor = nil::actor::get<string_actor>(key);
     key = std::string("test-actor-string-key2");
@@ -109,14 +109,14 @@ SEASTAR_THREAD_TEST_CASE(key_value_lvref_string_preserved) {
     BOOST_CHECK(counterActor.tell(string_actor::message::get_key()).get0() == "test-actor-string-key");
 }
 
-SEASTAR_THREAD_TEST_CASE(key_value_rvref_custom_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_rvref_custom_preserved) {
     auto counterActor = nil::actor::get<custom_key_actor>({0});
 
     BOOST_CHECK(counterActor.tell(custom_key_actor::message::get_key()).get0() != custom_key {1});
     BOOST_CHECK(counterActor.tell(custom_key_actor::message::get_key()).get0() == custom_key {0});
 }
 
-SEASTAR_THREAD_TEST_CASE(key_value_lvref_custom_preserved) {
+ACTOR_THREAD_TEST_CASE(key_value_lvref_custom_preserved) {
     auto key = custom_key {0};
     auto counterActor = nil::actor::get<custom_key_actor>(key);
 

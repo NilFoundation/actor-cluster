@@ -29,7 +29,7 @@ macro(define_actor_test name)
         set_target_properties(actor_${name}_test PROPERTIES CXX_STANDARD 17)
     endif()
 
-    target_compile_definitions(actor_${name}_test PRIVATE SEASTAR_TESTING_MAIN)
+    target_compile_definitions(actor_${name}_test PRIVATE ACTOR_TESTING_MAIN)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")

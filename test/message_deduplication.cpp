@@ -183,7 +183,7 @@ using namespace nil::actor;
  * Local
  */
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_message_packing_instanciation_count) {
+ACTOR_THREAD_TEST_CASE (ensure_local_message_packing_instanciation_count) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::increment(), [](auto &d) {
         for (int j = 0; j < 1000; ++j) {
@@ -196,7 +196,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_message_packing_instanciation_count) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -208,7 +208,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_fut_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -222,7 +222,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_fut_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -234,7 +234,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -248,7 +248,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -256,7 +256,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_void_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_void_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -270,7 +270,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_void_exception_message_packing) {
 }
 
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_fut_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_void(), [](auto &d) {
         d();
@@ -282,7 +282,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_fut_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_void(), [](auto &d) {
         d();
@@ -296,7 +296,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_fut_exception_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::noop_void(), [](auto &d) {
         d();
@@ -308,7 +308,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::exception_void(), [](auto &d) {
         d();
@@ -322,7 +322,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_exception_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_void_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -330,7 +330,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_void_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_local_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_local_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_void(), [](auto &d) {
         d();
@@ -348,7 +348,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_local_void_exception_void_message_packing) {
  * Collocated
  */
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -360,7 +360,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -374,7 +374,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -386,7 +386,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -400,7 +400,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -408,7 +408,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_void_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -422,7 +422,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_exception_message_packing) {
 }
 
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_void(), [](auto &d) {
         d();
@@ -434,7 +434,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_void(), [](auto &d) {
         d();
@@ -448,7 +448,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_fut_exception_void_message_packing) 
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::noop_void(), [](auto &d) {
         d();
@@ -460,7 +460,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::exception_void(), [](auto &d) {
         d();
@@ -474,7 +474,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_exception_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_void_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -482,7 +482,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_collocated_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_void(), [](auto &d) {
         d();
@@ -499,7 +499,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_collocated_void_exception_void_message_packing)
  * Worker actor
  */
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -511,7 +511,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -525,7 +525,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -537,7 +537,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -551,7 +551,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_exception_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -559,7 +559,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_void_nocopy_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_void_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_exception_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -573,7 +573,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_void_exception_message_packing) {
 }
 
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_fut_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_noop_void(), [](auto &d) {
         d();
@@ -585,7 +585,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_exception_void(), [](auto &d) {
         d();
@@ -599,7 +599,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_fut_exception_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::noop_void(), [](auto &d) {
         d();
@@ -611,7 +611,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::exception_void(), [](auto &d) {
         d();
@@ -625,7 +625,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_exception_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_void_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -633,7 +633,7 @@ SEASTAR_THREAD_TEST_CASE (ensure_worker_void_void_message_packing) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (ensure_worker_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE (ensure_worker_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_exception_void(), [](auto &d) {
         d();

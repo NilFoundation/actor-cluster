@@ -51,7 +51,7 @@ using namespace nil::actor;
  * Local
  */
 
-SEASTAR_THREAD_TEST_CASE (local_actor_scheduling) {
+ACTOR_THREAD_TEST_CASE (local_actor_scheduling) {
     BOOST_WARN(nil::actor::smp::count > 1);
 
     auto counterActor1 = nil::actor::get<actor1>(0);

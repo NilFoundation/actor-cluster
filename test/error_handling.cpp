@@ -49,7 +49,7 @@ using namespace nil::actor;
  * Local
  */
 
-SEASTAR_THREAD_TEST_CASE (local_core_actor_throws_void) {
+ACTOR_THREAD_TEST_CASE (local_core_actor_throws_void) {
         auto ref = nil::actor::get<error_actor>(0);
 
         ref.tell(error_actor::message::void_throws()).then([] {
@@ -69,7 +69,7 @@ SEASTAR_THREAD_TEST_CASE (local_core_actor_throws_void) {
         }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (local_core_actor_throws_future) {
+ACTOR_THREAD_TEST_CASE (local_core_actor_throws_future) {
     auto ref = nil::actor::get<error_actor>(0);
 
     ref.tell(error_actor::message::future_throws()).then([] {
@@ -88,7 +88,7 @@ SEASTAR_THREAD_TEST_CASE (local_core_actor_throws_future) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (local_core_actor_exceptionnal_future) {
+ACTOR_THREAD_TEST_CASE (local_core_actor_exceptionnal_future) {
     auto ref = nil::actor::get<error_actor>(0);
 
     ref.tell(error_actor::message::ex_future()).then([] {
@@ -107,7 +107,7 @@ SEASTAR_THREAD_TEST_CASE (local_core_actor_exceptionnal_future) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (collocated_core_actor_throws_void) {
+ACTOR_THREAD_TEST_CASE (collocated_core_actor_throws_void) {
     auto ref = nil::actor::get<error_actor>(1);
 
     ref.tell(error_actor::message::void_throws()).then([] {
@@ -127,7 +127,7 @@ SEASTAR_THREAD_TEST_CASE (collocated_core_actor_throws_void) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (collocated_core_actor_throws_future) {
+ACTOR_THREAD_TEST_CASE (collocated_core_actor_throws_future) {
     auto ref = nil::actor::get<error_actor>(1);
 
     ref.tell(error_actor::message::future_throws()).then([] {
@@ -146,7 +146,7 @@ SEASTAR_THREAD_TEST_CASE (collocated_core_actor_throws_future) {
     }).wait();
 }
 
-SEASTAR_THREAD_TEST_CASE (collocated_core_actor_exceptionnal_future) {
+ACTOR_THREAD_TEST_CASE (collocated_core_actor_exceptionnal_future) {
     auto ref = nil::actor::get<error_actor>(1);
 
     ref.tell(error_actor::message::ex_future()).then([] {
