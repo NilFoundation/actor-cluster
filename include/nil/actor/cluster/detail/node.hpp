@@ -29,34 +29,36 @@
 
 #include <nil/actor/cluster/detail/message_serializer.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        namespace detail {
-            struct node {
-                nil::actor::socket_address endpoint;
-                nil::actor::lw_shared_ptr<rpc_proto::client> client;
-                rpc_proto *rpc;
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            namespace detail {
+                struct node {
+                    nil::actor::socket_address endpoint;
+                    nil::actor::lw_shared_ptr<rpc_proto::client> client;
+                    rpc_proto *rpc;
 
-                node(uint32_t ip4, uint16_t port);
-                node(rpc_proto *proto, nil::actor::lw_shared_ptr<rpc_proto::client> &&client);
+                    node(uint32_t ip4, uint16_t port);
+                    node(rpc_proto *proto, nil::actor::lw_shared_ptr<rpc_proto::client> &&client);
 
-                node(node const &) = default;
+                    node(node const &) = default;
 
-                node(node &&) = default;
+                    node(node &&) = default;
 
-                node &operator=(node const &n) = default;
+                    node &operator=(node const &n) = default;
 
-                node &operator=(node &&n) = default;
+                    node &operator=(node &&n) = default;
 
-                bool operator==(const node &rhs) const;
+                    bool operator==(const node &rhs) const;
 
-                bool operator!=(const node &rhs) const;
+                    bool operator!=(const node &rhs) const;
 
-                explicit operator nil::actor::socket_address() const;
-            };
-        }    // namespace detail
-    }        // namespace cluster
-}    // namespace nil::actor
+                    explicit operator nil::actor::socket_address() const;
+                };
+            }    // namespace detail
+        }        // namespace cluster
+    }            // namespace actor
+}    // namespace nil
 
 namespace std {
     template<>

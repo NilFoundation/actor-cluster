@@ -37,7 +37,7 @@ namespace nil {
                         return nil::actor::parallel_for_each(
                                    peers,
                                    [](nil::actor::socket_address const &peer) {
-                                       return impl::membership::service.invoke_on_all(
+                                       return detail::membership::service.invoke_on_all(
                                            [peer](auto &service) { return service.try_add_peer(peer); });
                                    })
                             .then([&peers] {

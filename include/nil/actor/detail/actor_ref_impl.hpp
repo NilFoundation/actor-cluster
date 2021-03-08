@@ -29,7 +29,7 @@
 #include <nil/actor/core/future.hh>
 #include <nil/actor/core/reactor.hh>
 
-#include <nil/actor/core/detail/directory.hpp>
+#include <nil/actor/detail/directory.hpp>
 
 #ifdef ULTRAMARINE_REMOTE
 

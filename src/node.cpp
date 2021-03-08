@@ -53,7 +53,7 @@ namespace nil {
 }    // namespace nil
 
 namespace std {
-    size_t hash<nil::actor::cluster::impl::node>::operator()(nil::actor::cluster::impl::node const &node) const {
+    size_t hash<nil::actor::cluster::detail::node>::operator()(nil::actor::cluster::detail::node const &node) const {
         std::size_t seed = 0;
         boost::hash_combine(seed, std::hash<uint32_t> {}(node.endpoint.addr().as_ipv4_address().ip.raw));
         boost::hash_combine(seed, node.endpoint.port());

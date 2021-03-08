@@ -29,46 +29,48 @@
 
 #include <nil/actor/cluster/detail/distributed_directory.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        namespace detail {
-            template<typename Actor>
-            class remote_actor_ref {
-                nil::actor::detail::ActorKey<Actor> key;
-                node const *loc;
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            namespace detail {
+                template<typename Actor>
+                class remote_actor_ref {
+                    nil::actor::detail::ActorKey<Actor> key;
+                    node const *loc;
 
-            public:
-                using ActorType = Actor;
+                public:
+                    using ActorType = Actor;
 
-                explicit constexpr remote_actor_ref(nil::actor::detail::ActorKey<Actor> k, std::size_t hash,
-                                                    node const *loc) :
-                    key(std::move(k)),
-                    loc(loc) {
-                }
+                    explicit constexpr remote_actor_ref(nil::actor::detail::ActorKey<Actor> k, std::size_t hash,
+                                                        node const *loc) :
+                        key(std::move(k)),
+                        loc(loc) {
+                    }
 
-                constexpr remote_actor_ref(remote_actor_ref const &) = default;
+                    constexpr remote_actor_ref(remote_actor_ref const &) = default;
 
-                constexpr remote_actor_ref(remote_actor_ref &&) noexcept = default;
+                    constexpr remote_actor_ref(remote_actor_ref &&) noexcept = default;
 
-                inline constexpr typename Actor::detail::template interface<remote_actor_ref<Actor>>
-                    operator->() const {
-                    return typename Actor::detail::template interface<remote_actor_ref<Actor>> {*this};
-                }
+                    inline constexpr typename Actor::detail::template interface<remote_actor_ref<Actor>>
+                        operator->() const {
+                        return typename Actor::detail::template interface<remote_actor_ref<Actor>> {*this};
+                    }
 
-                template<typename Handler, typename... Args>
-                inline constexpr auto tell(Handler message, Args &&...args) const {
-                    return directory<Actor>::dispatch_message(*loc, key,
-                                                              nil::actor::detail::vtable<Actor>::table[message],
-                                                              message.value, std::forward<Args>(args)...);
-                }
+                    template<typename Handler, typename... Args>
+                    inline constexpr auto tell(Handler message, Args &&...args) const {
+                        return directory<Actor>::dispatch_message(*loc, key,
+                                                                  nil::actor::detail::vtable<Actor>::table[message],
+                                                                  message.value, std::forward<Args>(args)...);
+                    }
 
-                template<typename Handler, typename PackedArgs>
-                constexpr auto inline tell_packed(Handler message, PackedArgs &&args) const {
-                    return directory<Actor>::dispatch_packed_message(*loc, key,
-                                                                     nil::actor::detail::vtable<Actor>::table[message],
-                                                                     message.value, std::forward<PackedArgs>(args));
-                }
-            };
-        }    // namespace detail
-    }        // namespace cluster
-}    // namespace nil::actor
+                    template<typename Handler, typename PackedArgs>
+                    constexpr auto inline tell_packed(Handler message, PackedArgs &&args) const {
+                        return directory<Actor>::dispatch_packed_message(
+                            *loc, key, nil::actor::detail::vtable<Actor>::table[message], message.value,
+                            std::forward<PackedArgs>(args));
+                    }
+                };
+            }    // namespace detail
+        }        // namespace cluster
+    }            // namespace actor
+}    // namespace nil

@@ -32,64 +32,66 @@
 #include <nil/actor/actor_ref.hpp>
 #include <nil/actor/detail/arguments_vector.hpp>
 
-#include "message_serializer.hpp"
+#include <nil/actor/cluster/detail/message_serializer.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        namespace impl {
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            namespace detail {
 
-            struct static_init : public boost::noncopyable {
-                explicit static_init(void (*func)()) {
-                    func();
+                struct static_init : public boost::noncopyable {
+                    explicit static_init(void (*func)()) {
+                        func();
+                    }
+                };
+
+                inline auto &message_handler_registry() {
+                    static std::unordered_map<uint32_t, std::function<void(rpc_proto *)>> init_handlers = {};
+                    return init_handlers;
                 }
-            };
 
-            inline auto &message_handler_registry() {
-                static std::unordered_map<uint32_t, std::function<void(rpc_proto *)>> init_handlers = {};
-                return init_handlers;
-            }
+                template<typename Actor, typename ActorKey, typename Ret, typename Class, typename... Args,
+                         typename Handler>
+                static constexpr void __attribute__((used))
+                register_remote_endpoint(Ret (Class::*fptr)(Args...), Handler message) {
+                    auto reg = [fptr, message](auto *rpc) {
+                        rpc->register_handler(message.value, [message](ActorKey key, Args... args) {
+                            return nil::actor::get<Actor>(std::forward<ActorKey>(key))
+                                .tell(message, std::forward<Args>(args)...);
+                        });
 
-            template<typename Actor, typename ActorKey, typename Ret, typename Class, typename... Args,
-                     typename Handler>
-            static constexpr void __attribute__((used))
-            register_remote_endpoint(Ret (Class::*fptr)(Args...), Handler message) {
-                auto reg = [fptr, message](auto *rpc) {
-                    rpc->register_handler(message.value, [message](ActorKey key, Args... args) {
-                        return nil::actor::get<Actor>(std::forward<ActorKey>(key))
-                            .tell(message, std::forward<Args>(args)...);
-                    });
+                        // packed version
+                        uint32_t packed_message_id = message.value | (1U << 0U);
+                        using ArgPack = nil::actor::detail::arguments_vector<std::tuple<Args...>>;
+                        rpc->register_handler(packed_message_id, [message](ActorKey key, ArgPack args) {
+                            auto actor = nil::actor::get<Actor>(std::forward<ActorKey>(key));
+                            return actor.tell_packed(message, std::forward<ArgPack>(args));
+                        });
+                    };
+                    message_handler_registry().insert({message.value, reg});
+                }
 
-                    // packed version
-                    uint32_t packed_message_id = message.value | (1U << 0U);
-                    using ArgPack = nil::actor::detail::arguments_vector<std::tuple<Args...>>;
-                    rpc->register_handler(packed_message_id, [message](ActorKey key, ArgPack args) {
-                        auto actor = nil::actor::get<Actor>(std::forward<ActorKey>(key));
-                        return actor.tell_packed(message, std::forward<ArgPack>(args));
-                    });
-                };
-                message_handler_registry().insert({message.value, reg});
-            }
+                template<typename Actor, typename ActorKey, typename Ret, typename Class, typename... Args,
+                         typename Handler>
+                static constexpr void __attribute__((used))
+                register_remote_endpoint(Ret (Class::*fptr)(Args...) const, Handler message) {
+                    auto reg = [fptr, message](auto *rpc) {
+                        rpc->register_handler(message.value, [message](ActorKey key, Args... args) {
+                            return nil::actor::get<Actor>(std::forward<ActorKey>(key))
+                                .tell(message, std::forward<Args>(args)...);
+                        });
 
-            template<typename Actor, typename ActorKey, typename Ret, typename Class, typename... Args,
-                     typename Handler>
-            static constexpr void __attribute__((used))
-            register_remote_endpoint(Ret (Class::*fptr)(Args...) const, Handler message) {
-                auto reg = [fptr, message](auto *rpc) {
-                    rpc->register_handler(message.value, [message](ActorKey key, Args... args) {
-                        return nil::actor::get<Actor>(std::forward<ActorKey>(key))
-                            .tell(message, std::forward<Args>(args)...);
-                    });
-
-                    // packed version
-                    uint32_t packed_message_id = message.value | (1U << 0U);
-                    using ArgPack = nil::actor::detail::arguments_vector<std::tuple<Args...>>;
-                    rpc->register_handler(packed_message_id, [message](ActorKey key, ArgPack args) {
-                        auto actor = nil::actor::get<Actor>(std::forward<ActorKey>(key));
-                        return actor.tell_packed(message, std::forward<ArgPack>(args));
-                    });
-                };
-                message_handler_registry().insert({message.value, reg});
-            }
-        }    // namespace impl
-    }        // namespace cluster
-}    // namespace nil::actor
+                        // packed version
+                        uint32_t packed_message_id = message.value | (1U << 0U);
+                        using ArgPack = nil::actor::detail::arguments_vector<std::tuple<Args...>>;
+                        rpc->register_handler(packed_message_id, [message](ActorKey key, ArgPack args) {
+                            auto actor = nil::actor::get<Actor>(std::forward<ActorKey>(key));
+                            return actor.tell_packed(message, std::forward<ArgPack>(args));
+                        });
+                    };
+                    message_handler_registry().insert({message.value, reg});
+                }
+            }    // namespace detail
+        }        // namespace cluster
+    }            // namespace actor
+}    // namespace nil

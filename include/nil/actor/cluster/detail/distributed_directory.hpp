@@ -30,77 +30,83 @@
 #include <nil/actor/cluster/detail/message_serializer.hpp>
 #include <nil/actor/cluster/detail/membership.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        namespace detail {
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            namespace detail {
 
-            template<typename T>
-            using ActorKey = nil::actor::detail::ActorKey<T>;
+                template<typename T>
+                using ActorKey = nil::actor::detail::ActorKey<T>;
 
-            template<typename Actor>
-            struct directory {
-                [[nodiscard]] static constexpr node const *hold_remote_peer(ActorKey<Actor> const &key,
-                                                                            std::size_t hash) {
-                    return membership::service.local().node_for_key(hash);
-                }
-
-                template<typename Ret, typename Class, typename... FArgs, typename... Args>
-                static constexpr auto dispatch_message(node const &n, ActorKey<Actor> const &key,
-                                                       Ret (Class::*fptr)(FArgs...) const, uint32_t id,
-                                                       Args &&...args) {
-                    if constexpr (std::is_same_v<Ret, void>) {
-                        using Sig = nil::actor::rpc::no_wait_type(ActorKey<Actor>, FArgs...);
-                        return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
-                    } else {
-                        using Sig = Ret(ActorKey<Actor>, FArgs...);
-                        return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                template<typename Actor>
+                struct directory {
+                    [[nodiscard]] static constexpr node const *hold_remote_peer(ActorKey<Actor> const &key,
+                                                                                std::size_t hash) {
+                        return membership::service.local().node_for_key(hash);
                     }
-                }
 
-                template<typename Ret, typename Class, typename... FArgs, typename... Args>
-                static constexpr auto dispatch_message(node const &n, ActorKey<Actor> const &key,
-                                                       Ret (Class::*fptr)(FArgs...), uint32_t id, Args &&...args) {
-                    if constexpr (std::is_same_v<Ret, void>) {
-                        using Sig = nil::actor::rpc::no_wait_type(ActorKey<Actor>, FArgs...);
-                        return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
-                    } else {
-                        using Sig = Ret(ActorKey<Actor>, FArgs...);
-                        return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                    template<typename Ret, typename Class, typename... FArgs, typename... Args>
+                    static constexpr auto dispatch_message(node const &n, ActorKey<Actor> const &key,
+                                                           Ret (Class::*fptr)(FArgs...) const, uint32_t id,
+                                                           Args &&...args) {
+                        if constexpr (std::is_same_v<Ret, void>) {
+                            using Sig = nil::actor::rpc::no_wait_type(ActorKey<Actor>, FArgs...);
+                            return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                        } else {
+                            using Sig = Ret(ActorKey<Actor>, FArgs...);
+                            return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                        }
                     }
-                }
 
-                template<typename Ret, typename Class, typename... FArgs, typename PackedArgs>
-                static constexpr auto dispatch_packed_message(node const &n, ActorKey<Actor> const &key,
-                                                              Ret (Class::*fptr)(FArgs...) const, uint32_t id,
-                                                              PackedArgs &&args) {
-                    using FutReturn = nil::actor::futurize_t<std::result_of_t<decltype(fptr)(Actor, FArgs...)>>;
-                    using ReturnType =
-                        typename nil::actor::detail::get0_return_type<typename FutReturn::value_type>::type;
-                    if constexpr (std::is_same_v<ReturnType, void>) {
-                        using Sig = nil::actor::future<>(ActorKey<Actor>, PackedArgs);
-                        return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key, std::forward<PackedArgs>(args));
-                    } else {
-                        using Sig = nil::actor::future<std::vector<ReturnType>>(ActorKey<Actor>, PackedArgs);
-                        return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key, std::forward<PackedArgs>(args));
+                    template<typename Ret, typename Class, typename... FArgs, typename... Args>
+                    static constexpr auto dispatch_message(node const &n, ActorKey<Actor> const &key,
+                                                           Ret (Class::*fptr)(FArgs...), uint32_t id, Args &&...args) {
+                        if constexpr (std::is_same_v<Ret, void>) {
+                            using Sig = nil::actor::rpc::no_wait_type(ActorKey<Actor>, FArgs...);
+                            return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                        } else {
+                            using Sig = Ret(ActorKey<Actor>, FArgs...);
+                            return n.rpc->make_client<Sig>(id)(*n.client, key, std::forward<Args>(args)...);
+                        }
                     }
-                }
 
-                template<typename Ret, typename Class, typename... FArgs, typename PackedArgs>
-                static constexpr auto dispatch_packed_message(node const &n, ActorKey<Actor> const &key,
-                                                              Ret (Class::*fptr)(FArgs...), uint32_t id,
-                                                              PackedArgs &&args) {
-                    using FutReturn = nil::actor::futurize_t<std::result_of_t<decltype(fptr)(Actor, FArgs...)>>;
-                    using ReturnType =
-                        typename nil::actor::detail::get0_return_type<typename FutReturn::value_type>::type;
-                    if constexpr (std::is_same_v<ReturnType, void>) {
-                        using Sig = nil::actor::future<>(ActorKey<Actor>, PackedArgs);
-                        return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key, std::forward<PackedArgs>(args));
-                    } else {
-                        using Sig = nil::actor::future<std::vector<ReturnType>>(ActorKey<Actor>, PackedArgs);
-                        return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key, std::forward<PackedArgs>(args));
+                    template<typename Ret, typename Class, typename... FArgs, typename PackedArgs>
+                    static constexpr auto dispatch_packed_message(node const &n, ActorKey<Actor> const &key,
+                                                                  Ret (Class::*fptr)(FArgs...) const, uint32_t id,
+                                                                  PackedArgs &&args) {
+                        using FutReturn = nil::actor::futurize_t<std::result_of_t<decltype(fptr)(Actor, FArgs...)>>;
+                        using ReturnType =
+                            typename nil::actor::detail::get0_return_type<typename FutReturn::value_type>::type;
+                        if constexpr (std::is_same_v<ReturnType, void>) {
+                            using Sig = nil::actor::future<>(ActorKey<Actor>, PackedArgs);
+                            return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key,
+                                                                            std::forward<PackedArgs>(args));
+                        } else {
+                            using Sig = nil::actor::future<std::vector<ReturnType>>(ActorKey<Actor>, PackedArgs);
+                            return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key,
+                                                                            std::forward<PackedArgs>(args));
+                        }
                     }
-                }
-            };
-        }    // namespace detail
-    }        // namespace cluster
-}    // namespace nil::actor
+
+                    template<typename Ret, typename Class, typename... FArgs, typename PackedArgs>
+                    static constexpr auto dispatch_packed_message(node const &n, ActorKey<Actor> const &key,
+                                                                  Ret (Class::*fptr)(FArgs...), uint32_t id,
+                                                                  PackedArgs &&args) {
+                        using FutReturn = nil::actor::futurize_t<std::result_of_t<decltype(fptr)(Actor, FArgs...)>>;
+                        using ReturnType =
+                            typename nil::actor::detail::get0_return_type<typename FutReturn::value_type>::type;
+                        if constexpr (std::is_same_v<ReturnType, void>) {
+                            using Sig = nil::actor::future<>(ActorKey<Actor>, PackedArgs);
+                            return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key,
+                                                                            std::forward<PackedArgs>(args));
+                        } else {
+                            using Sig = nil::actor::future<std::vector<ReturnType>>(ActorKey<Actor>, PackedArgs);
+                            return n.rpc->make_client<Sig>(id | (1U << 0U))(*n.client, key,
+                                                                            std::forward<PackedArgs>(args));
+                        }
+                    }
+                };
+            }    // namespace detail
+        }        // namespace cluster
+    }            // namespace actor
+}    // namespace nil

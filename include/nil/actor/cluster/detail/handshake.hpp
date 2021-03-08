@@ -28,12 +28,13 @@
 
 namespace nil::actor {
     namespace cluster {
-        namespace impl {
+        namespace detail {
             struct handshake_request {
                 std::vector<nil::actor::socket_address> known_nodes;
                 nil::actor::socket_address origin;
 
-                handshake_request(std::vector<nil::actor::socket_address> peers, nil::actor::socket_address const &origin);
+                handshake_request(std::vector<nil::actor::socket_address> peers,
+                                  nil::actor::socket_address const &origin);
 
                 template<typename Serializer, typename Output>
                 inline void serialize(Serializer s, Output &out) const {
@@ -69,6 +70,6 @@ namespace nil::actor {
                     return handshake_response(std::move(known_nodes), shard_count);
                 }
             };
-        }    // namespace impl
+        }    // namespace detail
     }        // namespace cluster
 }    // namespace nil::actor

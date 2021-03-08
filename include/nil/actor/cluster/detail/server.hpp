@@ -30,22 +30,24 @@
 #include <nil/actor/cluster/detail/node.hpp>
 #include <nil/actor/cluster/detail/message_handler_registry.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        namespace detail {
-            class server {
-            private:
-                rpc_proto proto {serializer {}};
-                std::unique_ptr<rpc_proto::server> rpc;
-                nil::actor::socket_address local;
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            namespace detail {
+                class server {
+                private:
+                    rpc_proto proto {serializer {}};
+                    std::unique_ptr<rpc_proto::server> rpc;
+                    nil::actor::socket_address local;
 
-            public:
-                explicit server(nil::actor::socket_address const &local);
+                public:
+                    explicit server(nil::actor::socket_address const &local);
 
-                nil::actor::future<> stop();
-                static inline nil::actor::sharded<server> service;
-                static inline nil::actor::future<> start(nil::actor::socket_address const &local);
-            };
-        }    // namespace detail
-    }        // namespace cluster
-}    // namespace nil::actor
+                    nil::actor::future<> stop();
+                    static inline nil::actor::sharded<server> service;
+                    static inline nil::actor::future<> start(nil::actor::socket_address const &local);
+                };
+            }    // namespace detail
+        }        // namespace cluster
+    }            // namespace actor
+}    // namespace nil
