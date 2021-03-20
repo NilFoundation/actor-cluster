@@ -36,9 +36,9 @@ class hello_actor : public ultramarine::actor<hello_actor> {
 public:
     using KeyType = std::string;
 
-    seastar::future<> say_hello() const {
-        seastar::print("Hello, %s.\n", key);
-        return seastar::make_ready_future();
+    nil::actor::future<> say_hello() const {
+        nil::actor::print("Hello, %s.\n", key);
+        return nil::actor::make_ready_future();
     }
 
     ULTRAMARINE_DEFINE_ACTOR(hello_actor, (say_hello));
