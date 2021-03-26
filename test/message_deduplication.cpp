@@ -49,7 +49,7 @@ struct no_copy_message {
 };
 
 class counter_actor : public nil::actor::actor<counter_actor> {
-ULTRAMARINE_DEFINE_ACTOR(counter_actor,
+ACTOR_DEFINE_ACTOR(counter_actor,
                          (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(
                                  void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(
                                  void_noop_void)(void_exception_void)(increment)(get_count));
@@ -114,7 +114,7 @@ public:
 
 class local_counter_actor : public nil::actor::actor<local_counter_actor>,
                             public nil::actor::local_actor<local_counter_actor> {
-ULTRAMARINE_DEFINE_ACTOR(local_counter_actor,
+ACTOR_DEFINE_ACTOR(local_counter_actor,
                          (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(
                                  void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(
                                  void_noop_void)(void_exception_void)(increment)(get_count));

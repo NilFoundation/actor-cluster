@@ -31,7 +31,7 @@
 
 #include <nil/actor/detail/directory.hpp>
 
-#ifdef ULTRAMARINE_REMOTE
+#ifdef ACTOR_REMOTE
 
 #include <nil/actor/cluster/detail/remote_actor_ref.hpp>
 
@@ -84,7 +84,7 @@ namespace nil::actor {
             }
         };
 
-#ifdef ULTRAMARINE_REMOTE
+#ifdef ACTOR_REMOTE
         template<typename Actor>
         using actor_ref_variant = std::variant<collocated_actor_ref<Actor>, cluster::detail::remote_actor_ref<Actor>>;
 #else
@@ -97,7 +97,7 @@ namespace nil::actor {
             auto hash = actor_directory<Actor>::hash_key(key);
             auto shard = typename Actor::PlacementStrategy {}(hash);
 
-#ifdef ULTRAMARINE_REMOTE
+#ifdef ACTOR_REMOTE
             using namespace nil::actor::cluster::detail;
             if (auto remote = cluster::detail::directory<Actor>::hold_remote_peer(std::forward<KeyType>(key), hash);
                 remote) {

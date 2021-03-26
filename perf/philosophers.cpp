@@ -29,9 +29,9 @@
 static constexpr std::size_t PhilosopherLen = 10;
 static constexpr std::size_t RoundLen = 1000;
 
-class arbitrator_actor : public ultramarine::actor<arbitrator_actor> {
+class arbitrator_actor : public nil::actor::actor<arbitrator_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(arbitrator_actor, (hungry)(done));
+    ACTOR_DEFINE_ACTOR(arbitrator_actor, (hungry)(done));
     std::array<bool, PhilosopherLen> forks {};
 
     nil::actor::future<bool> hungry(int philosopher_index) {
@@ -53,13 +53,13 @@ public:
 
 std::atomic<int> failed_attempts = 0;
 
-class philosopher_actor : public ultramarine::actor<philosopher_actor> {
+class philosopher_actor : public nil::actor::actor<philosopher_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(philosopher_actor, (start));
+    ACTOR_DEFINE_ACTOR(philosopher_actor, (start));
     int round = 0;
 
     nil::actor::future<> start() {
-        auto arbitrator = ultramarine::get<arbitrator_actor>(0);
+        auto arbitrator = nil::actor::get<arbitrator_actor>(0);
         return nil::actor::do_until([this] { return round >= RoundLen; },
                                     [this, arbitrator] {
                                         return arbitrator->hungry(this->key).then([this, arbitrator](bool allowed) {
@@ -80,16 +80,16 @@ nil::actor::future<> dinning_philosophers() {
         return arbitrator_actor::clear_directory().then([] {
             return nil::actor::parallel_for_each(
                        boost::irange(0UL, PhilosopherLen),
-                       [](int philo) { return ultramarine::get<philosopher_actor>(philo)->start(); })
+                       [](int philo) { return nil::actor::get<philosopher_actor>(philo)->start(); })
                 .then([] { nil::actor::print("performed a total of %d failed attempt\n", failed_attempts.load()); });
         });
     });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av,
+    return nil::actor::benchmark::run(ac, av,
                                        {
-                                           ULTRAMARINE_BENCH(dinning_philosophers),
+                                           ACTOR_BENCH(dinning_philosophers),
                                        },
                                        10);
 }

@@ -30,44 +30,46 @@
 #include <nil/actor/cluster/detail/server.hpp>
 #include <nil/actor/cluster/detail/membership.hpp>
 
-namespace nil::actor {
-    namespace cluster {
-        nil::actor::future<> with_cluster_impl(nil::actor::socket_address const &local,
-                                               std::vector<nil::actor::socket_address> &&peers);
+namespace nil {
+    namespace actor {
+        namespace cluster {
+            nil::actor::future<> with_cluster_impl(nil::actor::socket_address const &local,
+                                                   std::vector<nil::actor::socket_address> &&peers);
 
-        template<typename Func>
-        nil::actor::future<> with_cluster(nil::actor::socket_address const &local,
-                                          std::vector<nil::actor::socket_address> &&peers,
-                                          std::size_t minimum_connected_peers, Func &&func) {
-            return with_cluster_impl(local, std::move(peers))
-                .then([func = std::forward<Func>(func), minimum_connected_peers]() mutable {
-                    return detail::membership::service.local()
-                        .joined_cv
-                        .wait([minimum_connected_peers] {
-                            return detail::membership::service.local().members().size() >= minimum_connected_peers;
-                        })
-                        .then([func = std::forward<Func>(func)] {
-                            nil::actor::print("%d: Calling user code\n", nil::actor::engine().cpu_id());
-                            return func();
-                        });
-                });
-        }
+            template<typename Func>
+            nil::actor::future<> with_cluster(nil::actor::socket_address const &local,
+                                              std::vector<nil::actor::socket_address> &&peers,
+                                              std::size_t minimum_connected_peers, Func &&func) {
+                return with_cluster_impl(local, std::move(peers))
+                    .then([func = std::forward<Func>(func), minimum_connected_peers]() mutable {
+                        return detail::membership::service.local()
+                            .joined_cv
+                            .wait([minimum_connected_peers] {
+                                return detail::membership::service.local().members().size() >= minimum_connected_peers;
+                            })
+                            .then([func = std::forward<Func>(func)] {
+                                nil::actor::print("%d: Calling user code\n", nil::actor::engine().cpu_id());
+                                return func();
+                            });
+                    });
+            }
 
-        template<typename Func>
-        nil::actor::future<> with_cluster(nil::actor::socket_address const &local,
-                                          std::vector<nil::actor::socket_address> &&peers, Func &&func) {
-            return with_cluster(local, std::move(peers), 0, std::forward<Func>(func));
-        }
+            template<typename Func>
+            nil::actor::future<> with_cluster(nil::actor::socket_address const &local,
+                                              std::vector<nil::actor::socket_address> &&peers, Func &&func) {
+                return with_cluster(local, std::move(peers), 0, std::forward<Func>(func));
+            }
 
-        template<typename Func>
-        nil::actor::future<> with_cluster(nil::actor::socket_address const &local, std::size_t minimum_connected_peers,
-                                          Func &&func) {
-            return with_cluster(local, {}, minimum_connected_peers, std::forward<Func>(func));
-        }
+            template<typename Func>
+            nil::actor::future<> with_cluster(nil::actor::socket_address const &local,
+                                              std::size_t minimum_connected_peers, Func &&func) {
+                return with_cluster(local, {}, minimum_connected_peers, std::forward<Func>(func));
+            }
 
-        template<typename Func>
-        nil::actor::future<> with_cluster(nil::actor::socket_address const &local, Func &&func) {
-            return with_cluster(local, {}, 0, std::forward<Func>(func));
-        }
-    }    // namespace cluster
-}    // namespace nil::actor
+            template<typename Func>
+            nil::actor::future<> with_cluster(nil::actor::socket_address const &local, Func &&func) {
+                return with_cluster(local, {}, 0, std::forward<Func>(func));
+            }
+        }    // namespace cluster
+    }        // namespace actor
+}    // namespace nil

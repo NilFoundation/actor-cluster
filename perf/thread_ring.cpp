@@ -39,15 +39,15 @@ struct contiguous_placement_strategy {
     }
 };
 
-class thread_ring_actor : public ultramarine::actor<thread_ring_actor, contiguous_placement_strategy<25000UL>> {
+class thread_ring_actor : public nil::actor::actor<thread_ring_actor, contiguous_placement_strategy<25000UL>> {
 
 public:
-    ULTRAMARINE_DEFINE_ACTOR(thread_ring_actor, (ping));
-    ultramarine::actor_id next = (key + 1) % RingSize;
+    ACTOR_DEFINE_ACTOR(thread_ring_actor, (ping));
+    nil::actor::actor_id next = (key + 1) % RingSize;
 
     nil::actor::future<> ping(int remaining) {
         if (remaining > 0) {
-            return ultramarine::get<thread_ring_actor>(next)->ping(remaining - 1);
+            return nil::actor::get<thread_ring_actor>(next)->ping(remaining - 1);
         }
         return nil::actor::make_ready_future();
     }
@@ -55,9 +55,9 @@ public:
 
 nil::actor::future<> thread_ring() {
     return thread_ring_actor::clear_directory().then(
-        [] { return ultramarine::get<thread_ring_actor>(0)->ping(MessageCount); });
+        [] { return nil::actor::get<thread_ring_actor>(0)->ping(MessageCount); });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av, {ULTRAMARINE_BENCH(thread_ring)}, 10);
+    return nil::actor::benchmark::run(ac, av, {ACTOR_BENCH(thread_ring)}, 10);
 }

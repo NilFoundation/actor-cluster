@@ -29,24 +29,24 @@
 
 static constexpr std::size_t PingPongCount = 10000000;
 
-class ping_actor : public ultramarine::actor<ping_actor> {
+class ping_actor : public nil::actor::actor<ping_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(ping_actor, (ping_pong));
+    ACTOR_DEFINE_ACTOR(ping_actor, (ping_pong));
     std::size_t pingpong_count = 0;
 
     nil::actor::future<> ping_pong(int pong_addr);
 };
 
-class pong_actor : public ultramarine::actor<pong_actor> {
+class pong_actor : public nil::actor::actor<pong_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(pong_actor, (pong));
+    ACTOR_DEFINE_ACTOR(pong_actor, (pong));
 
     void pong() const;
 };
 
 nil::actor::future<> ping_actor::ping_pong(int pong_addr) {
     pingpong_count = 0;
-    auto pong = ultramarine::get<pong_actor>(pong_addr);
+    auto pong = nil::actor::get<pong_actor>(pong_addr);
     return nil::actor::do_until([this] { return pingpong_count >= PingPongCount; },
                                 [this, pong] { return pong->pong().then([this] { ++pingpong_count; }); });
 }
@@ -55,9 +55,9 @@ void pong_actor::pong() const {
 }
 
 nil::actor::future<> pingpong_collocated() {
-    return ultramarine::get<ping_actor>(0)->ping_pong(1);
+    return nil::actor::get<ping_actor>(0)->ping_pong(1);
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av, {ULTRAMARINE_BENCH(pingpong_collocated)}, 10);
+    return nil::actor::benchmark::run(ac, av, {ACTOR_BENCH(pingpong_collocated)}, 10);
 }

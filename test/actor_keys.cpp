@@ -60,7 +60,7 @@ class string_actor : public nil::actor::actor<string_actor> {
 public:
     using KeyType = std::string;
 
-    ULTRAMARINE_DEFINE_ACTOR(string_actor, (get_key))
+    ACTOR_DEFINE_ACTOR(string_actor, (get_key))
 };
 
 class custom_key_actor : public nil::actor::actor<custom_key_actor> {
@@ -72,7 +72,7 @@ class custom_key_actor : public nil::actor::actor<custom_key_actor> {
 public:
     using KeyType = custom_key;
 
-    ULTRAMARINE_DEFINE_ACTOR(custom_key_actor, (get_key))
+    ACTOR_DEFINE_ACTOR(custom_key_actor, (get_key))
 };
 
 using namespace nil::actor;

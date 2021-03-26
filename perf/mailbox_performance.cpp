@@ -30,9 +30,9 @@
 static constexpr std::size_t NumMessage = 1000;
 static constexpr std::size_t SenderCount = 1000;
 
-class receiver : public ultramarine::actor<receiver> {
+class receiver : public nil::actor::actor<receiver> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(receiver, (receive));
+    ACTOR_DEFINE_ACTOR(receiver, (receive));
     std::size_t received = 0;
 
     void receive() {
@@ -40,13 +40,13 @@ public:
     };
 };
 
-class sender : public ultramarine::actor<sender> {
+class sender : public nil::actor::actor<sender> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(sender, (send));
+    ACTOR_DEFINE_ACTOR(sender, (send));
     std::size_t sent = 0;
 
-    nil::actor::future<> send(ultramarine::actor_id whom) {
-        return nil::actor::do_with(ultramarine::get<receiver>(whom), [this](auto const &whom) {
+    nil::actor::future<> send(nil::actor::actor_id whom) {
+        return nil::actor::do_with(nil::actor::get<receiver>(whom), [this](auto const &whom) {
             return nil::actor::do_until([this] { return sent++ >= NumMessage; }, [&whom] { return whom->receive(); });
         });
     };
@@ -57,13 +57,13 @@ thread_local static int i;
 nil::actor::future<> mailbox_performance() {
     i = 0;
     return sender::clear_directory().then([] {
-        return ultramarine::with_buffer(SenderCount, [](auto &buffer) {
+        return nil::actor::with_buffer(SenderCount, [](auto &buffer) {
             return nil::actor::do_until([] { return i >= SenderCount; },
-                                        [&buffer] { return buffer(ultramarine::get<sender>(i++)->send(0)); });
+                                        [&buffer] { return buffer(nil::actor::get<sender>(i++)->send(0)); });
         });
     });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av, {ULTRAMARINE_BENCH(mailbox_performance)}, 10);
+    return nil::actor::benchmark::run(ac, av, {ACTOR_BENCH(mailbox_performance)}, 10);
 }

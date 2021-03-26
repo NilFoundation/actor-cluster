@@ -49,11 +49,11 @@ struct no_copy_message {
 
 class void_actor : public nil::actor::actor<void_actor> {
 public:
-ULTRAMARINE_DEFINE_ACTOR(void_actor,);
+ACTOR_DEFINE_ACTOR(void_actor,);
 };
 
 class counter_actor : public nil::actor::actor<counter_actor> {
-ULTRAMARINE_DEFINE_ACTOR(counter_actor,
+ACTOR_DEFINE_ACTOR(counter_actor,
                          (get_execution_shard)
                                  (increase_counter_future)(increase_counter_void)(get_counter_future)(get_counter_int)
                                  (move_arg_message)(move_return_value_message)(move_return_future_message)

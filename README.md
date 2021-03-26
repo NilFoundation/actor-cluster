@@ -32,7 +32,7 @@ Various guides, examples and API reference are [available here](https://hippobar
 First we need to define an [`actor`](https://hippobaro.github.io/ultramarine/api/doc_ultramarine__actor/):
 
 ```cpp
-class hello_actor : public ultramarine::actor<hello_actor> {
+class hello_actor : public nil::actor::actor<hello_actor> {
 public:
     using KeyType = std::string;
 
@@ -41,14 +41,14 @@ public:
         return nil::actor::make_ready_future();
     }
 
-    ULTRAMARINE_DEFINE_ACTOR(hello_actor, (say_hello));
+    ACTOR_DEFINE_ACTOR(hello_actor, (say_hello));
 };
 ```
 
 And then call the actor activation from anywhere in your seastar code using an [`actor_ref`](https://hippobaro.github.io/ultramarine/api/doc_ultramarine__actor_ref#standardese-ultramarine__actor_ref-Actor-):
 
 ```cpp
-auto ref = ultramarine::get<hello_actor>("Ultramarine");
+auto ref = nil::actor::get<hello_actor>("Ultramarine");
 auto future = ref->say_hello();
 // wait or attach a continuation to the returned future.
 ```

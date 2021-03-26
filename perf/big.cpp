@@ -53,18 +53,18 @@ public:
 
 thread_local long pseudo_random::value = 74755;
 
-class big_actor : public ultramarine::actor<big_actor> {
+class big_actor : public nil::actor::actor<big_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(big_actor, (ping)(pong));
+    ACTOR_DEFINE_ACTOR(big_actor, (ping)(pong));
     std::size_t pingpong_count = 0;
 
     nil::actor::future<> ping() {
-        return ultramarine::with_buffer(100, [this](auto &buffer) {
+        return nil::actor::with_buffer(100, [this](auto &buffer) {
             return nil::actor::do_until([this] { return pingpong_count >= PingPongCount; },
                                         [this, &buffer] {
                                             ++pingpong_count;
                                             auto next = pseudo_random::nextInt(ActorCount);
-                                            return buffer(ultramarine::get<big_actor>(next)->pong());
+                                            return buffer(nil::actor::get<big_actor>(next)->pong());
                                         });
         });
     };
@@ -76,13 +76,13 @@ int i;
 nil::actor::future<> big() {
     i = 0;
     return big_actor::clear_directory().then([] {
-        return ultramarine::with_buffer(100, [](auto &buffer) {
+        return nil::actor::with_buffer(100, [](auto &buffer) {
             return nil::actor::do_until([] { return i >= ActorCount; },
-                                        [&buffer] { return buffer(ultramarine::get<big_actor>(i++)->ping()); });
+                                        [&buffer] { return buffer(nil::actor::get<big_actor>(i++)->ping()); });
         });
     });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av, {ULTRAMARINE_BENCH(big)}, 10);
+    return nil::actor::benchmark::run(ac, av, {ACTOR_BENCH(big)}, 10);
 }

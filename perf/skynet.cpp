@@ -26,10 +26,10 @@
 #include <nil/actor/actor_ref.hpp>
 #include "benchmark_utility.hpp"
 
-class skynet_singleton_actor : public ultramarine::actor<skynet_singleton_actor> {
+class skynet_singleton_actor : public nil::actor::actor<skynet_singleton_actor> {
 public:
     using KeyType = unsigned long;
-    ULTRAMARINE_DEFINE_ACTOR(skynet_singleton_actor, (skynet));
+    ACTOR_DEFINE_ACTOR(skynet_singleton_actor, (skynet));
 
     nil::actor::future<unsigned long> skynet(unsigned long num, unsigned long size, unsigned int div) const {
         if (size == 1) {
@@ -41,7 +41,7 @@ public:
 
         for (int i = 0; i < div; ++i) {
             auto sub_num = num + i * (size / div);
-            tasks.emplace_back(ultramarine::get<skynet_singleton_actor>(sub_num)->skynet(
+            tasks.emplace_back(nil::actor::get<skynet_singleton_actor>(sub_num)->skynet(
                 (unsigned long)sub_num, (unsigned long)size / div, (unsigned int)div));
         }
 
@@ -58,11 +58,11 @@ public:
     }
 };
 
-class skynet_local_actor : public ultramarine::actor<skynet_local_actor>,
-                           public ultramarine::local_actor<skynet_local_actor> {
+class skynet_local_actor : public nil::actor::actor<skynet_local_actor>,
+                           public nil::actor::local_actor<skynet_local_actor> {
 public:
     using KeyType = unsigned long;
-    ULTRAMARINE_DEFINE_ACTOR(skynet_local_actor, (skynet));
+    ACTOR_DEFINE_ACTOR(skynet_local_actor, (skynet));
 
     nil::actor::future<unsigned long> skynet(unsigned long num, unsigned long size, unsigned int div) const {
         if (size == 1) {
@@ -74,7 +74,7 @@ public:
 
         for (int i = 0; i < div; ++i) {
             auto sub_num = num + i * (size / div);
-            tasks.emplace_back(ultramarine::get<skynet_local_actor>(0)->skynet(
+            tasks.emplace_back(nil::actor::get<skynet_local_actor>(0)->skynet(
                 (unsigned long)sub_num, (unsigned long)size / div, (unsigned int)div));
         }
 
@@ -121,21 +121,21 @@ auto skynet_futures() {
 
 auto skynet_s_actor() {
     return skynet_singleton_actor::clear_directory().then(
-        [] { return ultramarine::get<skynet_singleton_actor>(0)->skynet(0, max, breath).discard_result(); });
+        [] { return nil::actor::get<skynet_singleton_actor>(0)->skynet(0, max, breath).discard_result(); });
 }
 
 auto skynet_l_actor() {
     return skynet_local_actor::clear_directory().then(
-        [] { return ultramarine::get<skynet_local_actor>(0)->skynet(0, max, breath).discard_result(); });
+        [] { return nil::actor::get<skynet_local_actor>(0)->skynet(0, max, breath).discard_result(); });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac,
+    return nil::actor::benchmark::run(ac,
                                        av,
                                        {
-                                           ULTRAMARINE_BENCH(skynet_futures),
-                                           ULTRAMARINE_BENCH(skynet_s_actor),
-                                           ULTRAMARINE_BENCH(skynet_l_actor),
+                                           ACTOR_BENCH(skynet_futures),
+                                           ACTOR_BENCH(skynet_s_actor),
+                                           ACTOR_BENCH(skynet_l_actor),
                                        },
                                        100);
 }

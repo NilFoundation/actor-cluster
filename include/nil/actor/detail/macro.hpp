@@ -32,43 +32,43 @@
 #include <nil/actor/detail/message_identifier.hpp>
 
 /// \exclude
-#define ULTRAMARINE_LITERAL(lit) #lit
+#define ACTOR_LITERAL(lit) #lit
 
-#define ULTRAMARINE_MAKE_IDENTITY(actor, handler)                                                    \
-    boost::hana::uint<nil::actor::detail::crc32(ULTRAMARINE_LITERAL(actor::handler),                \
-                                                 sizeof(ULTRAMARINE_LITERAL(actor::handler)) - 1)> { \
+#define ACTOR_MAKE_IDENTITY(actor, handler)                                                    \
+    boost::hana::uint<nil::actor::detail::crc32(ACTOR_LITERAL(actor::handler),                \
+                                                 sizeof(ACTOR_LITERAL(actor::handler)) - 1)> { \
     }
 
 /// \exclude
-#define ULTRAMARINE_MAKE_TAG(a, data, i, tag)        \
+#define ACTOR_MAKE_TAG(a, data, i, tag)        \
     static constexpr auto tag() {                    \
-        return ULTRAMARINE_MAKE_IDENTITY(data, tag); \
+        return ACTOR_MAKE_IDENTITY(data, tag); \
     }
 
 /// \exclude
-#define ULTRAMARINE_MAKE_TAG_ALT(a, data, i, tag)                                                                 \
+#define ACTOR_MAKE_TAG_ALT(a, data, i, tag)                                                                 \
     template<typename... Args, typename T = data>                                                                 \
     inline constexpr nil::actor::futurize_t<std::result_of_t<decltype (&T::tag)(T, Args...)>> tag(Args &&...args) \
         const {                                                                                                   \
-        return ref.tell(ULTRAMARINE_MAKE_IDENTITY(data, tag), std::forward<Args>(args)...);                       \
+        return ref.tell(ACTOR_MAKE_IDENTITY(data, tag), std::forward<Args>(args)...);                       \
     }
 
 /// \exclude
-#define ULTRAMARINE_MAKE_TUPLE(a, data, i, name) \
-    boost::hana::make_pair(ULTRAMARINE_MAKE_IDENTITY(data, name), &data::name),
+#define ACTOR_MAKE_TUPLE(a, data, i, name) \
+    boost::hana::make_pair(ACTOR_MAKE_IDENTITY(data, name), &data::name),
 
 /// \exclude
-#define ULTRAMARINE_MAKE_VTABLE(name, seq)                                                                         \
+#define ACTOR_MAKE_VTABLE(name, seq)                                                                         \
     static constexpr auto make_vtable() {                                                                          \
-        return boost::hana::make_map(BOOST_PP_SEQ_FOR_EACH_I(ULTRAMARINE_MAKE_TUPLE, name, seq)                    \
+        return boost::hana::make_map(BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TUPLE, name, seq)                    \
                                          boost::hana::make_pair(BOOST_HANA_STRING("nil::actor_dummy"), nullptr)); \
     }
 
-#ifdef ULTRAMARINE_REMOTE
+#ifdef ACTOR_REMOTE
 #include <nil/actor/cluster/detail/macro.hpp>
 #else
 /// \exclude
-#define ULTRAMARINE_REMOTE_MAKE_VTABLE(name, seq)
+#define ACTOR_REMOTE_MAKE_VTABLE(name, seq)
 #endif
 
 /// \brief Expands with enclosing actor internal definitions
@@ -80,13 +80,13 @@
 ///     nil::actor::future<> my_message() const;
 ///     nil::actor::future<> another_message() const;
 ///
-///     ULTRAMARINE_DEFINE_ACTOR(simple_actor, (my_message)(another_message));
+///     ACTOR_DEFINE_ACTOR(simple_actor, (my_message)(another_message));
 /// };
 /// ```
-/// \unique_name ULTRAMARINE_DEFINE_ACTOR
+/// \unique_name ACTOR_DEFINE_ACTOR
 /// \requires `name` shall be a [nil::actor::actor]() derived type
 /// \requires `seq` shall be a sequence of zero or more message handler (Example: `(handler1)(handler2)`)
-#define ULTRAMARINE_DEFINE_ACTOR(name, seq)                                                                         \
+#define ACTOR_DEFINE_ACTOR(name, seq)                                                                         \
 private:                                                                                                            \
     KeyType key;                                                                                                    \
                                                                                                                     \
@@ -102,17 +102,17 @@ public:                                                                         
             }                                                                                                       \
             explicit interface(interface const &) = delete;                                                         \
             explicit interface(interface &&) = delete;                                                              \
-            BOOST_PP_SEQ_FOR_EACH_I(ULTRAMARINE_MAKE_TAG_ALT, name, seq)                                            \
+            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG_ALT, name, seq)                                            \
             constexpr auto operator->() {                                                                           \
                 return this;                                                                                        \
             }                                                                                                       \
         };                                                                                                          \
         struct message {                                                                                            \
-            BOOST_PP_SEQ_FOR_EACH_I(ULTRAMARINE_MAKE_TAG, name, seq)                                                \
+            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG, name, seq)                                                \
         private:                                                                                                    \
             friend class nil::actor::detail::vtable<name>;                                                         \
-            ULTRAMARINE_MAKE_VTABLE(name, seq)                                                                      \
-            ULTRAMARINE_REMOTE_MAKE_VTABLE(name, seq)                                                               \
+            ACTOR_MAKE_VTABLE(name, seq)                                                                      \
+            ACTOR_REMOTE_MAKE_VTABLE(name, seq)                                                               \
         };                                                                                                          \
     };                                                                                                              \
     using message = detail::message; /* FIXME: workaround */\

@@ -40,7 +40,7 @@ public:
         return nil::actor::make_exception_future(std::make_exception_ptr(std::runtime_error("error")));
     }
 
-    ULTRAMARINE_DEFINE_ACTOR(error_actor, (void_throws)(future_throws)(ex_future))
+    ACTOR_DEFINE_ACTOR(error_actor, (void_throws)(future_throws)(ex_future))
 };
 
 using namespace nil::actor;

@@ -29,18 +29,18 @@
 
 #include <nil/actor/core/future-util.hh>
 
-class skynet_singleton_actor : public ultramarine::actor<skynet_singleton_actor> {
+class skynet_singleton_actor : public nil::actor::actor<skynet_singleton_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(skynet_singleton_actor, (noop));
+    ACTOR_DEFINE_ACTOR(skynet_singleton_actor, (noop));
 
     void noop() const {
     }
 };
 
-class skynet_local_actor : public ultramarine::actor<skynet_local_actor>,
-                           public ultramarine::local_actor<skynet_local_actor> {
+class skynet_local_actor : public nil::actor::actor<skynet_local_actor>,
+                           public nil::actor::local_actor<skynet_local_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(skynet_local_actor, (noop));
+    ACTOR_DEFINE_ACTOR(skynet_local_actor, (noop));
 
     void noop() const {
     }
@@ -51,12 +51,12 @@ auto create_actors() {
     constexpr auto create = 10000;
 
     return nil::actor::parallel_for_each(boost::irange(0, create),
-                                         [](int j) { return ultramarine::get<Type>(j)->noop(); });
+                                         [](int j) { return nil::actor::get<Type>(j)->noop(); });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av,
-                                       {ULTRAMARINE_BENCH(create_actors<skynet_singleton_actor>),
-                                        ULTRAMARINE_BENCH(create_actors<skynet_local_actor>)},
+    return nil::actor::benchmark::run(ac, av,
+                                       {ACTOR_BENCH(create_actors<skynet_singleton_actor>),
+                                        ACTOR_BENCH(create_actors<skynet_local_actor>)},
                                        100);
 }

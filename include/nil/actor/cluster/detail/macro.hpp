@@ -31,14 +31,14 @@
 #include <nil/actor/detail/message_identifier.hpp>
 
 /// \exclude
-#define ULTRAMARINE_MAKE_REMOTE_ENDPOINT(a, data, i, name) \
+#define ACTOR_MAKE_REMOTE_ENDPOINT(a, data, i, name) \
     nil::actor::cluster::detail::register_remote_endpoint<data, KeyType>(&data::name, detail::message::name());
 
 /// \exclude
-#define ULTRAMARINE_REMOTE_MAKE_VTABLE(name, seq)                             \
+#define ACTOR_REMOTE_MAKE_VTABLE(name, seq)                             \
     static constexpr void export_vtable() {                                   \
-        BOOST_PP_SEQ_FOR_EACH_I(ULTRAMARINE_MAKE_REMOTE_ENDPOINT, name, seq); \
+        BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_REMOTE_ENDPOINT, name, seq); \
     }                                                                         \
-    static inline nil::actor::cluster::detail::static_init init =            \
+    static inline nil::actor::cluster::detail::static_init init =             \
         nil::actor::cluster::detail::static_init(&export_vtable);\
 

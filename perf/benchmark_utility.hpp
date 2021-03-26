@@ -34,7 +34,7 @@
 #include <nil/actor/cluster/cluster.hpp>
 #include <nil/actor/core/sleep.hh>
 
-#define ULTRAMARINE_BENCH(name) \
+#define ACTOR_BENCH(name) \
     { #name, name }
 
 template<typename T>
@@ -54,7 +54,7 @@ T stDev(const std::vector<T> &data) {
     return std::sqrt(variance(data));
 }
 
-namespace ultramarine::benchmark {
+namespace nil::actor::benchmark {
 
     using benchmark_list = std::initializer_list<std::pair<std::string_view, nil::actor::future<> (*)()>>;
 
@@ -129,7 +129,7 @@ namespace ultramarine::benchmark {
 
             return nil::actor::do_with(std::move(benchs), std::vector<std::chrono::microseconds::rep>(),
                                        [run, &config, local, peers](auto &benchs, auto &vec) mutable {
-                                           return ultramarine::cluster::with_cluster(
+                                           return nil::actor::cluster::with_cluster(
                                                std::move(local), std::move(peers), config["minimum-peers"].as<int>(),
                                                [run, &benchs, &config]() {
                                                    if (config["initiator"].as<bool>()) {
@@ -154,4 +154,4 @@ namespace ultramarine::benchmark {
     }
 
 #endif
-}    // namespace ultramarine::benchmark
+}    // namespace nil::actor::benchmark

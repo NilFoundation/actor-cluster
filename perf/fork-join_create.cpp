@@ -32,9 +32,9 @@
 
 static constexpr std::size_t CreationCount = 16000000;
 
-class create_actor : public ultramarine::actor<create_actor> {
+class create_actor : public nil::actor::actor<create_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(create_actor, (process));
+    ACTOR_DEFINE_ACTOR(create_actor, (process));
     void process() {
         auto volatile sint = std::sin(37.2);
         auto volatile res = sint * sint;
@@ -47,13 +47,13 @@ static int i;    // need to be not on stack
 nil::actor::future<> fork_join_create_buffered() {
     i = 0;
     return create_actor::clear_directory().then([] {
-        return ultramarine::with_buffer(100, [](auto &buffer) {
+        return nil::actor::with_buffer(100, [](auto &buffer) {
             return nil::actor::do_until([] { return i >= CreationCount; },
-                                        [&buffer] { return buffer(ultramarine::get<create_actor>(i++)->process()); });
+                                        [&buffer] { return buffer(nil::actor::get<create_actor>(i++)->process()); });
         });
     });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av, {ULTRAMARINE_BENCH(fork_join_create_buffered)}, 10);
+    return nil::actor::benchmark::run(ac, av, {ACTOR_BENCH(fork_join_create_buffered)}, 10);
 }

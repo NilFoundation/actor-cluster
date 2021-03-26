@@ -33,9 +33,9 @@
 static constexpr std::size_t Iteration = 10000;
 static constexpr std::size_t WorkerCount = 1000;
 
-class throughput_actor : public ultramarine::actor<throughput_actor> {
+class throughput_actor : public nil::actor::actor<throughput_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(throughput_actor, (process)(create));
+    ACTOR_DEFINE_ACTOR(throughput_actor, (process)(create));
 
     void process() {
         auto volatile sint = std::sin(37.2);
@@ -51,7 +51,7 @@ public:
 static int i;    // need to be not on stack
 nil::actor::future<> fork_join_throughput() {
     return nil::actor::parallel_for_each(boost::irange(0UL, WorkerCount), [](int i) {
-        return ultramarine::deduplicate(ultramarine::get<throughput_actor>(i), throughput_actor::message::process(),
+        return nil::actor::deduplicate(nil::actor::get<throughput_actor>(i), throughput_actor::message::process(),
                                         [](auto &d) {
                                             for (int j = 0; j < Iteration; ++j) {
                                                 d();
@@ -61,9 +61,9 @@ nil::actor::future<> fork_join_throughput() {
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av,
+    return nil::actor::benchmark::run(ac, av,
                                        {
-                                           ULTRAMARINE_BENCH(fork_join_throughput),
+                                           ACTOR_BENCH(fork_join_throughput),
                                        },
                                        10);
 }

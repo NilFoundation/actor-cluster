@@ -41,7 +41,7 @@ namespace nil::actor {
     /// \tparam Derived The derived actor class for CRTP purposes
     /// \tparam LocalPlacementStrategy Optional. Allows to specify a custom local placement strategy. Defaults to
     /// [nil::actor::default_local_placement_strategy]() \requires `Derived` should implement actor behavior using
-    /// [ULTRAMARINE_DEFINE_ACTOR]()
+    /// [ACTOR_DEFINE_ACTOR]()
     template<typename Derived, typename LocalPlacementStrategy = detail::default_local_placement_strategy>
     struct actor : private boost::noncopyable {
 

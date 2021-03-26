@@ -29,9 +29,9 @@
 
 #include <nil/actor/core/future-util.hh>
 
-class fibonacci_actor : public ultramarine::actor<fibonacci_actor> {
+class fibonacci_actor : public nil::actor::actor<fibonacci_actor> {
 public:
-    ULTRAMARINE_DEFINE_ACTOR(fibonacci_actor, (fib));
+    ACTOR_DEFINE_ACTOR(fibonacci_actor, (fib));
 
     int result = -1;
 
@@ -42,8 +42,8 @@ public:
         } else if (result > 0) {
             return nil::actor::make_ready_future<int>(result);
         } else {
-            auto f1 = ultramarine::get<fibonacci_actor>(key - 1)->fib();
-            auto f2 = ultramarine::get<fibonacci_actor>(key - 2)->fib();
+            auto f1 = nil::actor::get<fibonacci_actor>(key - 1)->fib();
+            auto f2 = nil::actor::get<fibonacci_actor>(key - 2)->fib();
             return nil::actor::when_all_succeed(std::move(f1), std::move(f2)).then([this](auto r1, auto r2) {
                 return result = r1 + r2;
             });
@@ -53,13 +53,13 @@ public:
 
 auto fib() {
     return fibonacci_actor::clear_directory().then(
-        [] { return ultramarine::get<fibonacci_actor>(36)->fib().discard_result(); });
+        [] { return nil::actor::get<fibonacci_actor>(36)->fib().discard_result(); });
 }
 
 int main(int ac, char **av) {
-    return ultramarine::benchmark::run(ac, av,
+    return nil::actor::benchmark::run(ac, av,
                                        {
-                                           ULTRAMARINE_BENCH(fib),
+                                           ACTOR_BENCH(fib),
                                        },
                                        10);
 }

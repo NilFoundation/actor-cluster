@@ -34,7 +34,7 @@ class actor1 : public nil::actor::actor<actor1>, public nil::actor::non_reentran
         return nil::actor::sleep(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(500)));
     }
 
-ULTRAMARINE_DEFINE_ACTOR(actor1, (stall));
+ACTOR_DEFINE_ACTOR(actor1, (stall));
 };
 
 class actor2 : public nil::actor::actor<actor2>, public nil::actor::local_actor<actor2> {
@@ -42,7 +42,7 @@ class actor2 : public nil::actor::actor<actor2>, public nil::actor::local_actor<
         return nil::actor::sleep(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(500)));
     }
 
-ULTRAMARINE_DEFINE_ACTOR(actor2, (stall));
+ACTOR_DEFINE_ACTOR(actor2, (stall));
 };
 
 using namespace nil::actor;
