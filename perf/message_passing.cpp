@@ -62,9 +62,9 @@ public:
         return std::accumulate(std::begin(pack), std::end(pack), 0);
     }
 
-    ACTOR_DEFINE_ACTOR(counter_actor,
-                             (increase_counter_future)(increase_counter_void)(get_counter_future)(get_counter_int)(
-                                 accumulate_future)(accumulate_value)(noop));
+    ACTOR_DEFINE_ACTOR(
+        counter_actor,
+        (increase_counter_future)(increase_counter_void)(get_counter_future)(get_counter_int)(accumulate_future)(accumulate_value)(noop));
 };
 
 /*
@@ -243,48 +243,48 @@ auto local_actor_deduplicated_void() {
 auto local_actor_deduplicated_int_future() {
     auto counterActor = nil::actor::get<counter_actor>(0);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::get_counter_future(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d();
-                                        }
-                                    })
+                                   counter_actor::message::get_counter_future(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d();
+                                       }
+                                   })
         .discard_result();
 }
 
 auto local_actor_deduplicated_int() {
     auto counterActor = nil::actor::get<counter_actor>(0);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::get_counter_int(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d();
-                                        }
-                                    })
+                                   counter_actor::message::get_counter_int(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d();
+                                       }
+                                   })
         .discard_result();
 }
 
 auto local_actor_deduplicated_future_args() {
     auto counterActor = nil::actor::get<counter_actor>(0);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::accumulate_future(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d(std::vector<int> {10, 12, 30, j});
-                                        }
-                                    })
+                                   counter_actor::message::accumulate_future(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d(std::vector<int> {10, 12, 30, j});
+                                       }
+                                   })
         .discard_result();
 }
 
 auto local_actor_deduplicated_int_args() {
     auto counterActor = nil::actor::get<counter_actor>(0);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::accumulate_value(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d(std::vector<int> {10, 12, 30, j});
-                                        }
-                                    })
+                                   counter_actor::message::accumulate_value(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d(std::vector<int> {10, 12, 30, j});
+                                       }
+                                   })
         .discard_result();
 }
 
@@ -391,83 +391,83 @@ auto collocated_actor_deduplicated_void() {
 auto collocated_actor_deduplicated_int_future() {
     auto counterActor = nil::actor::get<counter_actor>(1);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::get_counter_future(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d();
-                                        }
-                                    })
+                                   counter_actor::message::get_counter_future(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d();
+                                       }
+                                   })
         .discard_result();
 }
 
 auto collocated_actor_deduplicated_int() {
     auto counterActor = nil::actor::get<counter_actor>(1);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::get_counter_int(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d();
-                                        }
-                                    })
+                                   counter_actor::message::get_counter_int(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d();
+                                       }
+                                   })
         .discard_result();
 }
 
 auto collocated_actor_deduplicated_future_args() {
     auto counterActor = nil::actor::get<counter_actor>(1);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::accumulate_future(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d(std::vector<int> {10, 12, 30, j});
-                                        }
-                                    })
+                                   counter_actor::message::accumulate_future(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d(std::vector<int> {10, 12, 30, j});
+                                       }
+                                   })
         .discard_result();
 }
 
 auto collocated_actor_deduplicated_int_args() {
     auto counterActor = nil::actor::get<counter_actor>(1);
     return nil::actor::deduplicate(counterActor,
-                                    counter_actor::message::accumulate_value(),
-                                    [](auto &d) {
-                                        for (int j = 0; j < 10000; ++j) {
-                                            d(std::vector<int> {10, 12, 30, j});
-                                        }
-                                    })
+                                   counter_actor::message::accumulate_value(),
+                                   [](auto &d) {
+                                       for (int j = 0; j < 10000; ++j) {
+                                           d(std::vector<int> {10, 12, 30, j});
+                                       }
+                                   })
         .discard_result();
 }
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac,
-                                       av,
-                                       {ACTOR_BENCH(plain_object_void_future),
-                                        ACTOR_BENCH(local_actor_void_future),
-                                        ACTOR_BENCH(local_actor_deduplicated_void_future),
-                                        ACTOR_BENCH(collocated_actor_void_future),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_void_future),
-                                        ACTOR_BENCH(plain_object_void),
-                                        ACTOR_BENCH(local_actor_void),
-                                        ACTOR_BENCH(local_actor_deduplicated_void),
-                                        ACTOR_BENCH(collocated_actor_void),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_void),
-                                        ACTOR_BENCH(plain_object_int_future),
-                                        ACTOR_BENCH(local_actor_int_future),
-                                        ACTOR_BENCH(local_actor_deduplicated_int_future),
-                                        ACTOR_BENCH(collocated_actor_int_future),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_int_future),
-                                        ACTOR_BENCH(plain_object_int),
-                                        ACTOR_BENCH(local_actor_int),
-                                        ACTOR_BENCH(local_actor_deduplicated_int),
-                                        ACTOR_BENCH(collocated_actor_int),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_int),
-                                        ACTOR_BENCH(plain_object_future_args),
-                                        ACTOR_BENCH(local_actor_future_args),
-                                        ACTOR_BENCH(local_actor_deduplicated_future_args),
-                                        ACTOR_BENCH(collocated_actor_future_args),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_future_args),
-                                        ACTOR_BENCH(plain_object_int_args),
-                                        ACTOR_BENCH(local_actor_int_args),
-                                        ACTOR_BENCH(local_actor_deduplicated_int_args),
-                                        ACTOR_BENCH(collocated_actor_int_args),
-                                        ACTOR_BENCH(collocated_actor_deduplicated_int_args)},
-                                       1000);
+                                      av,
+                                      {ACTOR_BENCH(plain_object_void_future),
+                                       ACTOR_BENCH(local_actor_void_future),
+                                       ACTOR_BENCH(local_actor_deduplicated_void_future),
+                                       ACTOR_BENCH(collocated_actor_void_future),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_void_future),
+                                       ACTOR_BENCH(plain_object_void),
+                                       ACTOR_BENCH(local_actor_void),
+                                       ACTOR_BENCH(local_actor_deduplicated_void),
+                                       ACTOR_BENCH(collocated_actor_void),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_void),
+                                       ACTOR_BENCH(plain_object_int_future),
+                                       ACTOR_BENCH(local_actor_int_future),
+                                       ACTOR_BENCH(local_actor_deduplicated_int_future),
+                                       ACTOR_BENCH(collocated_actor_int_future),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_int_future),
+                                       ACTOR_BENCH(plain_object_int),
+                                       ACTOR_BENCH(local_actor_int),
+                                       ACTOR_BENCH(local_actor_deduplicated_int),
+                                       ACTOR_BENCH(collocated_actor_int),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_int),
+                                       ACTOR_BENCH(plain_object_future_args),
+                                       ACTOR_BENCH(local_actor_future_args),
+                                       ACTOR_BENCH(local_actor_deduplicated_future_args),
+                                       ACTOR_BENCH(collocated_actor_future_args),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_future_args),
+                                       ACTOR_BENCH(plain_object_int_args),
+                                       ACTOR_BENCH(local_actor_int_args),
+                                       ACTOR_BENCH(local_actor_deduplicated_int_args),
+                                       ACTOR_BENCH(collocated_actor_int_args),
+                                       ACTOR_BENCH(collocated_actor_deduplicated_int_args)},
+                                      1000);
 }

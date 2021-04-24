@@ -88,8 +88,8 @@ nil::actor::future<> dinning_philosophers() {
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac, av,
-                                       {
-                                           ACTOR_BENCH(dinning_philosophers),
-                                       },
-                                       10);
+                                      {
+                                          ACTOR_BENCH(dinning_philosophers),
+                                      },
+                                      10);
 }

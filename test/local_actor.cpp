@@ -34,7 +34,7 @@ class actor1 : public nil::actor::actor<actor1>, public nil::actor::non_reentran
         return nil::actor::sleep(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(500)));
     }
 
-ACTOR_DEFINE_ACTOR(actor1, (stall));
+    ACTOR_DEFINE_ACTOR(actor1, (stall));
 };
 
 class actor2 : public nil::actor::actor<actor2>, public nil::actor::local_actor<actor2> {
@@ -42,7 +42,7 @@ class actor2 : public nil::actor::actor<actor2>, public nil::actor::local_actor<
         return nil::actor::sleep(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::milliseconds(500)));
     }
 
-ACTOR_DEFINE_ACTOR(actor2, (stall));
+    ACTOR_DEFINE_ACTOR(actor2, (stall));
 };
 
 using namespace nil::actor;
@@ -51,28 +51,26 @@ using namespace nil::actor;
  * Local
  */
 
-ACTOR_THREAD_TEST_CASE (local_actor_scheduling) {
+ACTOR_THREAD_TEST_CASE(local_actor_scheduling) {
     BOOST_WARN(nil::actor::smp::count > 1);
 
     auto counterActor1 = nil::actor::get<actor1>(0);
 
     auto start1 = std::chrono::steady_clock::now();
-    nil::actor::when_all(
-            counterActor1.tell(actor1::message::stall()),
-            counterActor1.tell(actor1::message::stall()),
-            counterActor1.tell(actor1::message::stall()),
-            counterActor1.tell(actor1::message::stall())
-    ).wait();
+    nil::actor::when_all(counterActor1.tell(actor1::message::stall()),
+                         counterActor1.tell(actor1::message::stall()),
+                         counterActor1.tell(actor1::message::stall()),
+                         counterActor1.tell(actor1::message::stall()))
+        .wait();
     auto end1 = std::chrono::steady_clock::now();
 
     auto counterActor2 = nil::actor::get<actor2>(0);
     auto start2 = std::chrono::steady_clock::now();
-    nil::actor::when_all(
-            counterActor2.tell(actor2::message::stall()),
-            counterActor2.tell(actor2::message::stall()),
-            counterActor2.tell(actor2::message::stall()),
-            counterActor2.tell(actor2::message::stall())
-    ).wait();
+    nil::actor::when_all(counterActor2.tell(actor2::message::stall()),
+                         counterActor2.tell(actor2::message::stall()),
+                         counterActor2.tell(actor2::message::stall()),
+                         counterActor2.tell(actor2::message::stall()))
+        .wait();
     auto end2 = std::chrono::steady_clock::now();
 
     auto time1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1);

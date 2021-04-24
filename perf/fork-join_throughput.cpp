@@ -52,18 +52,18 @@ static int i;    // need to be not on stack
 nil::actor::future<> fork_join_throughput() {
     return nil::actor::parallel_for_each(boost::irange(0UL, WorkerCount), [](int i) {
         return nil::actor::deduplicate(nil::actor::get<throughput_actor>(i), throughput_actor::message::process(),
-                                        [](auto &d) {
-                                            for (int j = 0; j < Iteration; ++j) {
-                                                d();
-                                            }
-                                        });
+                                       [](auto &d) {
+                                           for (int j = 0; j < Iteration; ++j) {
+                                               d();
+                                           }
+                                       });
     });
 }
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac, av,
-                                       {
-                                           ACTOR_BENCH(fork_join_throughput),
-                                       },
-                                       10);
+                                      {
+                                          ACTOR_BENCH(fork_join_throughput),
+                                      },
+                                      10);
 }

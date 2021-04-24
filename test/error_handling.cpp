@@ -49,118 +49,110 @@ using namespace nil::actor;
  * Local
  */
 
-ACTOR_THREAD_TEST_CASE (local_core_actor_throws_void) {
-        auto ref = nil::actor::get<error_actor>(0);
+ACTOR_THREAD_TEST_CASE(local_core_actor_throws_void) {
+    auto ref = nil::actor::get<error_actor>(0);
 
-        ref.tell(error_actor::message::void_throws()).then([] {
-            BOOST_FAIL("Exception escaped");
-        }).handle_exception([] (std::exception_ptr eptr) {
+    ref.tell(error_actor::message::void_throws())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
             BOOST_CHECK(eptr);
             try {
                 std::rethrow_exception(eptr);
-            }
-            catch (std::runtime_error const& ex) {
+            } catch (std::runtime_error const &ex) {
                 BOOST_REQUIRE_EQUAL(ex.what(), "error");
-            }
-            catch (...) {
+            } catch (...) {
                 BOOST_FAIL("Exception type was unexpected");
             }
-
-        }).wait();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (local_core_actor_throws_future) {
+ACTOR_THREAD_TEST_CASE(local_core_actor_throws_future) {
     auto ref = nil::actor::get<error_actor>(0);
 
-    ref.tell(error_actor::message::future_throws()).then([] {
-        BOOST_FAIL("Exception escaped");
-    }).handle_exception([] (std::exception_ptr eptr) {
-        BOOST_CHECK(eptr);
-        try {
-            std::rethrow_exception(eptr);
-        }
-        catch (std::runtime_error const& ex) {
-            BOOST_REQUIRE_EQUAL(ex.what(), "error");
-        }
-        catch (...) {
-            BOOST_FAIL("Exception type was unexpected");
-        }
-    }).wait();
+    ref.tell(error_actor::message::future_throws())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
+            BOOST_CHECK(eptr);
+            try {
+                std::rethrow_exception(eptr);
+            } catch (std::runtime_error const &ex) {
+                BOOST_REQUIRE_EQUAL(ex.what(), "error");
+            } catch (...) {
+                BOOST_FAIL("Exception type was unexpected");
+            }
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (local_core_actor_exceptionnal_future) {
+ACTOR_THREAD_TEST_CASE(local_core_actor_exceptionnal_future) {
     auto ref = nil::actor::get<error_actor>(0);
 
-    ref.tell(error_actor::message::ex_future()).then([] {
-        BOOST_FAIL("Exception escaped");
-    }).handle_exception([] (std::exception_ptr eptr) {
-        BOOST_CHECK(eptr);
-        try {
-            std::rethrow_exception(eptr);
-        }
-        catch (std::runtime_error const& ex) {
-            BOOST_REQUIRE_EQUAL(ex.what(), "error");
-        }
-        catch (...) {
-            BOOST_FAIL("Exception type was unexpected");
-        }
-    }).wait();
+    ref.tell(error_actor::message::ex_future())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
+            BOOST_CHECK(eptr);
+            try {
+                std::rethrow_exception(eptr);
+            } catch (std::runtime_error const &ex) {
+                BOOST_REQUIRE_EQUAL(ex.what(), "error");
+            } catch (...) {
+                BOOST_FAIL("Exception type was unexpected");
+            }
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (collocated_core_actor_throws_void) {
+ACTOR_THREAD_TEST_CASE(collocated_core_actor_throws_void) {
     auto ref = nil::actor::get<error_actor>(1);
 
-    ref.tell(error_actor::message::void_throws()).then([] {
-        BOOST_FAIL("Exception escaped");
-    }).handle_exception([] (std::exception_ptr eptr) {
-        BOOST_CHECK(eptr);
-        try {
-            std::rethrow_exception(eptr);
-        }
-        catch (std::runtime_error const& ex) {
-            BOOST_REQUIRE_EQUAL(ex.what(), "error");
-        }
-        catch (...) {
-            BOOST_FAIL("Exception type was unexpected");
-        }
-
-    }).wait();
+    ref.tell(error_actor::message::void_throws())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
+            BOOST_CHECK(eptr);
+            try {
+                std::rethrow_exception(eptr);
+            } catch (std::runtime_error const &ex) {
+                BOOST_REQUIRE_EQUAL(ex.what(), "error");
+            } catch (...) {
+                BOOST_FAIL("Exception type was unexpected");
+            }
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (collocated_core_actor_throws_future) {
+ACTOR_THREAD_TEST_CASE(collocated_core_actor_throws_future) {
     auto ref = nil::actor::get<error_actor>(1);
 
-    ref.tell(error_actor::message::future_throws()).then([] {
-        BOOST_FAIL("Exception escaped");
-    }).handle_exception([] (std::exception_ptr eptr) {
-        BOOST_CHECK(eptr);
-        try {
-            std::rethrow_exception(eptr);
-        }
-        catch (std::runtime_error const& ex) {
-            BOOST_REQUIRE_EQUAL(ex.what(), "error");
-        }
-        catch (...) {
-            BOOST_FAIL("Exception type was unexpected");
-        }
-    }).wait();
+    ref.tell(error_actor::message::future_throws())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
+            BOOST_CHECK(eptr);
+            try {
+                std::rethrow_exception(eptr);
+            } catch (std::runtime_error const &ex) {
+                BOOST_REQUIRE_EQUAL(ex.what(), "error");
+            } catch (...) {
+                BOOST_FAIL("Exception type was unexpected");
+            }
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (collocated_core_actor_exceptionnal_future) {
+ACTOR_THREAD_TEST_CASE(collocated_core_actor_exceptionnal_future) {
     auto ref = nil::actor::get<error_actor>(1);
 
-    ref.tell(error_actor::message::ex_future()).then([] {
-        BOOST_FAIL("Exception escaped");
-    }).handle_exception([] (std::exception_ptr eptr) {
-        BOOST_CHECK(eptr);
-        try {
-            std::rethrow_exception(eptr);
-        }
-        catch (std::runtime_error const& ex) {
-            BOOST_REQUIRE_EQUAL(ex.what(), "error");
-        }
-        catch (...) {
-            BOOST_FAIL("Exception type was unexpected");
-        }
-    }).wait();
+    ref.tell(error_actor::message::ex_future())
+        .then([] { BOOST_FAIL("Exception escaped"); })
+        .handle_exception([](std::exception_ptr eptr) {
+            BOOST_CHECK(eptr);
+            try {
+                std::rethrow_exception(eptr);
+            } catch (std::runtime_error const &ex) {
+                BOOST_REQUIRE_EQUAL(ex.what(), "error");
+            } catch (...) {
+                BOOST_FAIL("Exception type was unexpected");
+            }
+        })
+        .wait();
 }

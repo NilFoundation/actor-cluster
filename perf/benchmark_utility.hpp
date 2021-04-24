@@ -101,9 +101,12 @@ namespace nil::actor::benchmark {
         nil::actor::app_template app;
         namespace bpo = boost::program_options;
         app.add_options()("local,l", bpo::value<std::string>(), "Local node address in format 'ip4:port'")(
-            "minimum-peers,m", bpo::value<int>()->default_value(1), "Wait for the cluster to be least this large")(
-            "initiator", bpo::value<bool>()->default_value(false), "Initiate benchmark")(
-            "peers", bpo::value<std::vector<std::string>>()->multitoken(), "List of peers in format 'ip4:port'");
+            "minimum-peers,m", bpo::value<int>()->default_value(1),
+            "Wait for the cluster to be least this large")("initiator", bpo::value<bool>()->default_value(false),
+                                                           "Initiate benchmark")("peers",
+                                                                                 bpo::value<std::vector<std::string>>()
+                                                                                     ->multitoken(),
+                                                                                 "List of peers in format 'ip4:port'");
 
         return app.run(ac, av, [benchs = std::move(benchs), run, &app] {
             auto &&config = app.configuration();

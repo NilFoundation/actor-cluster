@@ -66,4 +66,3 @@ namespace std {
         size_t operator()(nil::actor::cluster::detail::node const &node) const;
     };
 }    // namespace std
-

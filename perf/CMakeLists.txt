@@ -1,23 +1,23 @@
 function(add_ultramarine_benchmark)
-    set (options CLUSTERED)
-    set (one_value_args NAME)
-    set (multi_value_args SOURCES ARGS)
-    cmake_parse_arguments (args "${options}" "${one_value_args}" "${multi_value_args}" "${ARGN}")
+    set(options CLUSTERED)
+    set(one_value_args NAME)
+    set(multi_value_args SOURCES ARGS)
+    cmake_parse_arguments(args "${options}" "${one_value_args}" "${multi_value_args}" "${ARGN}")
 
     add_executable(${args_NAME} "${args_SOURCES}" benchmark_utility.hpp)
     target_link_libraries(${args_NAME} PRIVATE Ultramarine::actor)
-    add_dependencies (ultramarine-benchmarks ${args_NAME})
+    add_dependencies(ultramarine-benchmarks ${args_NAME})
 
-    if (${args_CLUSTERED})
+    if(${args_CLUSTERED})
         add_executable(${args_NAME}_clustered "${args_SOURCES}" benchmark_utility.hpp)
         target_link_libraries(${args_NAME}_clustered PRIVATE Ultramarine::cluster)
-        add_dependencies (ultramarine-benchmarks ${args_NAME}_clustered)
+        add_dependencies(ultramarine-benchmarks ${args_NAME}_clustered)
         target_compile_definitions(${args_NAME}_clustered PRIVATE CLUSTERED_BENCHMARK)
     endif()
 endfunction()
 
 # Logical target for all benchmarks.
-add_custom_target (ultramarine-benchmarks)
+add_custom_target(ultramarine-benchmarks)
 
 add_custom_command(
         TARGET ultramarine-benchmarks POST_BUILD

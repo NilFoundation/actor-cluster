@@ -131,11 +131,11 @@ auto skynet_l_actor() {
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac,
-                                       av,
-                                       {
-                                           ACTOR_BENCH(skynet_futures),
-                                           ACTOR_BENCH(skynet_s_actor),
-                                           ACTOR_BENCH(skynet_l_actor),
-                                       },
-                                       100);
+                                      av,
+                                      {
+                                          ACTOR_BENCH(skynet_futures),
+                                          ACTOR_BENCH(skynet_s_actor),
+                                          ACTOR_BENCH(skynet_l_actor),
+                                      },
+                                      100);
 }

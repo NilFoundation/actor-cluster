@@ -54,11 +54,11 @@ public:
         auto counter = nil::actor::get<counting_actor>(counter_addr);
 
         return nil::actor::deduplicate(counter, counting_actor::message::increment(),
-                                        [this](auto &increment) {
-                                            for (produced = 0; produced < ProduceCount; ++produced) {
-                                                increment();
-                                            }
-                                        })
+                                       [this](auto &increment) {
+                                           for (produced = 0; produced < ProduceCount; ++produced) {
+                                               increment();
+                                           }
+                                       })
             .then([this, counter] {
                 return counter->count().then([this](std::size_t discovered) { assert(produced == discovered); });
             });
@@ -73,8 +73,8 @@ nil::actor::future<> count_collocated() {
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac, av,
-                                       {
-                                           ACTOR_BENCH(count_collocated),
-                                       },
-                                       100);
+                                      {
+                                          ACTOR_BENCH(count_collocated),
+                                      },
+                                      100);
 }

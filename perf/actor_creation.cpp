@@ -55,8 +55,7 @@ auto create_actors() {
 }
 
 int main(int ac, char **av) {
-    return nil::actor::benchmark::run(ac, av,
-                                       {ACTOR_BENCH(create_actors<skynet_singleton_actor>),
-                                        ACTOR_BENCH(create_actors<skynet_local_actor>)},
-                                       100);
+    return nil::actor::benchmark::run(
+        ac, av, {ACTOR_BENCH(create_actors<skynet_singleton_actor>), ACTOR_BENCH(create_actors<skynet_local_actor>)},
+        100);
 }

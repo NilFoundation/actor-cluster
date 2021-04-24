@@ -36,14 +36,14 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_network REQUIRED)
 
 # Compiler checks
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+check_cxx_compiler_flag("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
 
 # get header files; only needed by CMake generators,
 # e.g., for creating proper Xcode projects
 file(GLOB_RECURSE ${CURRENT_PROJECT_NAME}_HEADERS "include/nil/actor/*.hpp")
 
 # list cpp files excluding platform-dependent files
-set(${CURRENT_PROJECT_NAME}_SOURCES 
+set(${CURRENT_PROJECT_NAME}_SOURCES
     src/server.cpp
     src/membership.cpp
     src/node.cpp

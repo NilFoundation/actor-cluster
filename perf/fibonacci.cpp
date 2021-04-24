@@ -58,8 +58,8 @@ auto fib() {
 
 int main(int ac, char **av) {
     return nil::actor::benchmark::run(ac, av,
-                                       {
-                                           ACTOR_BENCH(fib),
-                                       },
-                                       10);
+                                      {
+                                          ACTOR_BENCH(fib),
+                                      },
+                                      10);
 }

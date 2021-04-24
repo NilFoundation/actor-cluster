@@ -36,9 +36,8 @@
 
 /// \exclude
 #define ACTOR_REMOTE_MAKE_VTABLE(name, seq)                             \
-    static constexpr void export_vtable() {                                   \
+    static constexpr void export_vtable() {                             \
         BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_REMOTE_ENDPOINT, name, seq); \
-    }                                                                         \
-    static inline nil::actor::cluster::detail::static_init init =             \
-        nil::actor::cluster::detail::static_init(&export_vtable);\
-
+    }                                                                   \
+    static inline nil::actor::cluster::detail::static_init init =       \
+        nil::actor::cluster::detail::static_init(&export_vtable);

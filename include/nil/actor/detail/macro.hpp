@@ -34,33 +34,32 @@
 /// \exclude
 #define ACTOR_LITERAL(lit) #lit
 
-#define ACTOR_MAKE_IDENTITY(actor, handler)                                                    \
+#define ACTOR_MAKE_IDENTITY(actor, handler)                                                   \
     boost::hana::uint<nil::actor::detail::crc32(ACTOR_LITERAL(actor::handler),                \
-                                                 sizeof(ACTOR_LITERAL(actor::handler)) - 1)> { \
+                                                sizeof(ACTOR_LITERAL(actor::handler)) - 1)> { \
     }
 
 /// \exclude
 #define ACTOR_MAKE_TAG(a, data, i, tag)        \
-    static constexpr auto tag() {                    \
+    static constexpr auto tag() {              \
         return ACTOR_MAKE_IDENTITY(data, tag); \
     }
 
 /// \exclude
-#define ACTOR_MAKE_TAG_ALT(a, data, i, tag)                                                                 \
+#define ACTOR_MAKE_TAG_ALT(a, data, i, tag)                                                                       \
     template<typename... Args, typename T = data>                                                                 \
     inline constexpr nil::actor::futurize_t<std::result_of_t<decltype (&T::tag)(T, Args...)>> tag(Args &&...args) \
         const {                                                                                                   \
-        return ref.tell(ACTOR_MAKE_IDENTITY(data, tag), std::forward<Args>(args)...);                       \
+        return ref.tell(ACTOR_MAKE_IDENTITY(data, tag), std::forward<Args>(args)...);                             \
     }
 
 /// \exclude
-#define ACTOR_MAKE_TUPLE(a, data, i, name) \
-    boost::hana::make_pair(ACTOR_MAKE_IDENTITY(data, name), &data::name),
+#define ACTOR_MAKE_TUPLE(a, data, i, name) boost::hana::make_pair(ACTOR_MAKE_IDENTITY(data, name), &data::name),
 
 /// \exclude
-#define ACTOR_MAKE_VTABLE(name, seq)                                                                         \
-    static constexpr auto make_vtable() {                                                                          \
-        return boost::hana::make_map(BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TUPLE, name, seq)                    \
+#define ACTOR_MAKE_VTABLE(name, seq)                                                                              \
+    static constexpr auto make_vtable() {                                                                         \
+        return boost::hana::make_map(BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TUPLE, name, seq)                         \
                                          boost::hana::make_pair(BOOST_HANA_STRING("nil::actor_dummy"), nullptr)); \
     }
 
@@ -86,7 +85,7 @@
 /// \unique_name ACTOR_DEFINE_ACTOR
 /// \requires `name` shall be a [nil::actor::actor]() derived type
 /// \requires `seq` shall be a sequence of zero or more message handler (Example: `(handler1)(handler2)`)
-#define ACTOR_DEFINE_ACTOR(name, seq)                                                                         \
+#define ACTOR_DEFINE_ACTOR(name, seq)                                                                               \
 private:                                                                                                            \
     KeyType key;                                                                                                    \
                                                                                                                     \
@@ -102,18 +101,17 @@ public:                                                                         
             }                                                                                                       \
             explicit interface(interface const &) = delete;                                                         \
             explicit interface(interface &&) = delete;                                                              \
-            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG_ALT, name, seq)                                            \
+            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG_ALT, name, seq)                                                  \
             constexpr auto operator->() {                                                                           \
                 return this;                                                                                        \
             }                                                                                                       \
         };                                                                                                          \
         struct message {                                                                                            \
-            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG, name, seq)                                                \
+            BOOST_PP_SEQ_FOR_EACH_I(ACTOR_MAKE_TAG, name, seq)                                                      \
         private:                                                                                                    \
-            friend class nil::actor::detail::vtable<name>;                                                         \
-            ACTOR_MAKE_VTABLE(name, seq)                                                                      \
-            ACTOR_REMOTE_MAKE_VTABLE(name, seq)                                                               \
+            friend class nil::actor::detail::vtable<name>;                                                          \
+            ACTOR_MAKE_VTABLE(name, seq)                                                                            \
+            ACTOR_REMOTE_MAKE_VTABLE(name, seq)                                                                     \
         };                                                                                                          \
     };                                                                                                              \
-    using message = detail::message; /* FIXME: workaround */\
-
+    using message = detail::message; /* FIXME: workaround */

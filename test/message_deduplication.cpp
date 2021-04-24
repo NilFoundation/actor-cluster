@@ -49,18 +49,20 @@ struct no_copy_message {
 };
 
 class counter_actor : public nil::actor::actor<counter_actor> {
-ACTOR_DEFINE_ACTOR(counter_actor,
-                         (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(
-                                 void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(
-                                 void_noop_void)(void_exception_void)(increment)(get_count));
+    ACTOR_DEFINE_ACTOR(
+        counter_actor,
+        (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(void_noop_void)(void_exception_void)(increment)(get_count));
 
 public:
-
     std::size_t count = 0;
 
-    void increment() { ++count; }
+    void increment() {
+        ++count;
+    }
 
-    std::size_t get_count() const { return count; }
+    std::size_t get_count() const {
+        return count;
+    }
 
     nil::actor::future<no_copy_message> fut_noop_nocopy(no_copy_message const &) const {
         return nil::actor::make_ready_future<no_copy_message>();
@@ -109,23 +111,24 @@ public:
     void void_exception_void() const {
         throw std::runtime_error("error");
     }
-
 };
 
 class local_counter_actor : public nil::actor::actor<local_counter_actor>,
                             public nil::actor::local_actor<local_counter_actor> {
-ACTOR_DEFINE_ACTOR(local_counter_actor,
-                         (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(
-                                 void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(
-                                 void_noop_void)(void_exception_void)(increment)(get_count));
+    ACTOR_DEFINE_ACTOR(
+        local_counter_actor,
+        (fut_noop_nocopy)(fut_exception_nocopy)(noop_nocopy)(exception_nocopy)(void_noop_nocopy)(void_exception_nocopy)(fut_noop_void)(fut_exception_void)(noop_void)(exception_void)(void_noop_void)(void_exception_void)(increment)(get_count));
 
 public:
-
     std::size_t count = 0;
 
-    void increment() { ++count; }
+    void increment() {
+        ++count;
+    }
 
-    std::size_t get_count() const { return count; }
+    std::size_t get_count() const {
+        return count;
+    }
 
     nil::actor::future<no_copy_message> fut_noop_nocopy(no_copy_message const &) const {
         return nil::actor::make_ready_future<no_copy_message>();
@@ -174,7 +177,6 @@ public:
     void void_exception_void() const {
         throw std::runtime_error("error");
     }
-
 };
 
 using namespace nil::actor;
@@ -183,72 +185,88 @@ using namespace nil::actor;
  * Local
  */
 
-ACTOR_THREAD_TEST_CASE (ensure_local_message_packing_instanciation_count) {
+ACTOR_THREAD_TEST_CASE(ensure_local_message_packing_instanciation_count) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::increment(), [](auto &d) {
-        for (int j = 0; j < 1000; ++j) {
-            d();
-        }
-    }).then([counterActor] {
-        return counterActor->get_count().then([](std::size_t count) {
-            BOOST_CHECK(count == 1000);
-        });
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::increment(),
+                            [](auto &d) {
+                                for (int j = 0; j < 1000; ++j) {
+                                    d();
+                                }
+                            })
+        .then([counterActor] {
+            return counterActor->get_count().then([](std::size_t count) { BOOST_CHECK(count == 1000); });
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -256,73 +274,89 @@ ACTOR_THREAD_TEST_CASE (ensure_local_void_nocopy_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_void_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::void_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-
-ACTOR_THREAD_TEST_CASE (ensure_local_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_fut_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_void_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -330,77 +364,93 @@ ACTOR_THREAD_TEST_CASE (ensure_local_void_void_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_local_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_local_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(0);
-    nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::void_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
-
 
 /*
  * Collocated
  */
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -408,73 +458,89 @@ ACTOR_THREAD_TEST_CASE (ensure_collocated_void_nocopy_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_void_exception_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::void_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-
-ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_fut_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::fut_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::fut_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_void_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
     nil::actor::deduplicate(counterActor, counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -482,76 +548,93 @@ ACTOR_THREAD_TEST_CASE (ensure_collocated_void_void_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_collocated_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_collocated_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<counter_actor>(1);
-    nil::actor::deduplicate(counterActor, counter_actor::message::void_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            counter_actor::message::void_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
 /*
  * Worker actor
  */
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_fut_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_fut_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::fut_noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_fut_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_fut_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::fut_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::noop_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::noop_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_void_nocopy_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_void_nocopy_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_noop_nocopy(), [](auto &d) {
         d(no_copy_message());
@@ -559,73 +642,89 @@ ACTOR_THREAD_TEST_CASE (ensure_worker_void_nocopy_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_void_exception_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_void_exception_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::void_exception_nocopy(), [](auto &d) {
-        d(no_copy_message());
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::void_exception_nocopy(),
+                            [](auto &d) {
+                                d(no_copy_message());
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-
-ACTOR_THREAD_TEST_CASE (ensure_worker_fut_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_fut_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::fut_noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_fut_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_fut_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::fut_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::fut_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::noop_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_CHECK(std::size(vec) == 1);
-        return nil::actor::make_ready_future();
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::noop_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_CHECK(std::size(vec) == 1);
+            return nil::actor::make_ready_future();
+        })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([](auto &&vec) {
-        static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([](auto &&vec) {
+            static_assert(std::is_same_v<typename std::decay_t<decltype(vec)>::value_type, no_copy_message>);
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_void_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_void_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
     nil::actor::deduplicate(counterActor, local_counter_actor::message::void_noop_void(), [](auto &d) {
         d();
@@ -633,15 +732,18 @@ ACTOR_THREAD_TEST_CASE (ensure_worker_void_void_message_packing) {
     }).wait();
 }
 
-ACTOR_THREAD_TEST_CASE (ensure_worker_void_exception_void_message_packing) {
+ACTOR_THREAD_TEST_CASE(ensure_worker_void_exception_void_message_packing) {
     auto counterActor = nil::actor::get<local_counter_actor>(0);
-    nil::actor::deduplicate(counterActor, local_counter_actor::message::void_exception_void(), [](auto &d) {
-        d();
-        return nil::actor::make_ready_future();
-    }).then([]() {
-        BOOST_FAIL("received response, expected exception");
-        return nil::actor::make_ready_future();
-    }).handle_exception_type([](std::runtime_error const &ex) {
-        BOOST_CHECK(std::strcmp(ex.what(), "error") == 0);
-    }).wait();
+    nil::actor::deduplicate(counterActor,
+                            local_counter_actor::message::void_exception_void(),
+                            [](auto &d) {
+                                d();
+                                return nil::actor::make_ready_future();
+                            })
+        .then([]() {
+            BOOST_FAIL("received response, expected exception");
+            return nil::actor::make_ready_future();
+        })
+        .handle_exception_type([](std::runtime_error const &ex) { BOOST_CHECK(std::strcmp(ex.what(), "error") == 0); })
+        .wait();
 }
