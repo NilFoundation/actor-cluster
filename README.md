@@ -16,9 +16,9 @@ It is heavily inspired by the [Microsoft Orleans](https://dotnet.github.io/orlea
 # Installation
 
 Ultramarine is built upon [=nil; Actor.Core Library](https://github.com/nilfoundation/actor-core) and share the same
-dependencies. Seastar provides a convenience script to pull all necessary packages (`install-dependencies.sh`).
+dependencies. Actor provides a convenience script to pull all necessary packages (`install-dependencies.sh`).
 
-To pull Seastar and configure Ultramarine:
+To pull Actor and configure Ultramarine:
 
 ```
 ./cooking.sh -t Release
@@ -63,7 +63,7 @@ auto future = ref->say_hello();
 
 # Performance
 
-Ultramarine is built on Seastar and benefits from a
+Ultramarine is built on Actor and benefits from a
 lock-free, [shared-nothing design](http://seastar.io/shared-nothing/). Compared to typical actor model implementations,
 it doesn't use any locking or complex cache-unfriendly concurrent data-structures internally.
 
