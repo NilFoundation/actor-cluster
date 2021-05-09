@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <nil/actor/net/inet_address.hh>
-#include <nil/actor/net/ip.hh>
+#include <nil/actor/network/inet_address.hh>
+#include <nil/actor/network/ip.hh>
 
 #include <nil/actor/cluster/detail/message_serializer.hpp>
 

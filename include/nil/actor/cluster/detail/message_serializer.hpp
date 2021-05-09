@@ -29,8 +29,8 @@
 
 #include <nil/actor/rpc/rpc.hh>
 #include <nil/actor/rpc/rpc_types.hh>
-#include <nil/actor/net/inet_address.hh>
-#include <nil/actor/net/ip.hh>
+#include <nil/actor/network/inet_address.hh>
+#include <nil/actor/network/ip.hh>
 
 namespace nil {
     namespace actor {
