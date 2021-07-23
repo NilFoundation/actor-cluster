@@ -27,7 +27,7 @@
 namespace nil {
     namespace actor {
         namespace cluster {
-            namespace impl {
+            namespace detail {
                 handshake_request::handshake_request(std::vector<nil::actor::socket_address> peers,
                                                      const nil::actor::socket_address &origin) :
                     known_nodes(std::move(peers)),

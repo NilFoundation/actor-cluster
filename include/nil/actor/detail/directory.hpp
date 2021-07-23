@@ -64,23 +64,6 @@ namespace nil {
                 static constexpr auto table = Actor::detail::message::make_vtable();
             };
 
-            template<typename... T>
-            struct get0_return_type {
-                using type = void;
-
-                static type get0(std::tuple<T...> v) {
-                }
-            };
-
-            template<class T0, class... T>
-            struct get0_return_type<std::tuple<T0, T...>> {
-                using type = T0;
-
-                static type get0(std::tuple<T0, T...> v) {
-                    return std::get<0>(std::move(v));
-                }
-            };
-
             template<typename Actor>
             struct actor_directory {
 

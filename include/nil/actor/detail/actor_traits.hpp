@@ -84,41 +84,26 @@ namespace nil::actor {
     /// \tparam Actor The [nil::actor::actor]() type to test against
     /// \returns `true` if type `Actor` is reentrant, `false` otherwise
     template<typename Actor>
-    constexpr bool is_reentrant_v = !std::is_base_of_v<non_reentrant_actor<Actor>, Actor>;
-
-    /// Compile-time trait testing if the [nil::actor::actor]() type is reentrant
-    /// \requires Type `Actor` shall inherit from [nil::actor::actor]()
-    /// \tparam Actor The [nil::actor::actor]() type to test against
-    /// \returns `true` if type `Actor` is reentrant, `false` otherwise
-    template<typename Actor>
-    constexpr bool is_reentrant = !std::is_base_of<non_reentrant_actor<Actor>, Actor>::value;
+    struct is_reentrant {
+        constexpr static const bool value = !std::is_base_of<non_reentrant_actor<Actor>, Actor>::value;
+    };
 
     /// Compile-time trait testing if the [nil::actor::actor]() type is local
     /// \requires Type `Actor` shall inherit from [nil::actor::actor]()
     /// \tparam Actor The actor type to test against
     /// \returns `true` if type `Actor` is local, `false` otherwise
     template<typename Actor>
-    constexpr bool is_local_actor_v = std::is_base_of_v<detail::local_actor, Actor>;
-
-    /// Compile-time trait testing if the [nil::actor::actor]() type is local
-    /// \requires Type `Actor` shall inherit from [nil::actor::actor]()
-    /// \tparam Actor The actor type to test against
-    /// \returns `true` if type `Actor` is local, `false` otherwise
-    template<typename Actor>
-    constexpr bool is_local_actor = std::is_base_of<detail::local_actor, Actor>::value;
+    struct is_local_actor {
+        constexpr static const bool value = std::is_base_of<detail::local_actor, Actor>::value;
+    };
 
     /// Compile-time trait testing if the [nil::actor::local_actor]() type doesn't specify a concurrency limit
     /// \requires Type `Actor` shall inherit from [nil::actor::local_actor]()
     /// \tparam Actor The actor type to test against
     /// \returns `true` if `Actor` has no concurrency limit, `false` otherwise
     template<typename Actor>
-    constexpr bool is_unlimited_concurrent_local_actor_v = std::is_base_of_v<local_actor<Actor>, Actor>;
-
-    /// Compile-time trait testing if the [nil::actor::local_actor]() type doesn't specify a concurrency limit
-    /// \requires Type `Actor` shall inherit from [nil::actor::local_actor]()
-    /// \tparam Actor The actor type to test against
-    /// \returns `true` if `Actor` has no concurrency limit, `false` otherwise
-    template<typename Actor>
-    constexpr bool is_unlimited_concurrent_local_actor = std::is_base_of<local_actor<Actor>, Actor>::value;
+    struct is_unlimited_concurrent_local_actor {
+        constexpr static const bool value = std::is_base_of<local_actor<Actor>, Actor>::value;
+    };
 
 }    // namespace nil::actor

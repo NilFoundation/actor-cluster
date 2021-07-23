@@ -25,6 +25,7 @@
 #include <utility>
 
 #include <nil/actor/core/future-util.hh>
+
 #include <nil/actor/cluster/detail/membership.hpp>
 #include <nil/actor/cluster/detail/message_handler_registry.hpp>
 

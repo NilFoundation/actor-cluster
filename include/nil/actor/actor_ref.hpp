@@ -134,14 +134,13 @@ namespace nil {
             /// \returns The value returned by the provided lambda, if any
             template<typename Func>
             inline constexpr auto visit(Func &&func) const noexcept {
-                nil::actor::shard_id next = 0;
+                shard_id next = 0;
 
-                if constexpr (is_unlimited_concurrent_local_actor_v<Actor>) {
-                    next = (Actor::round_robin_counter++ + nil::actor::engine().cpu_id()) % nil::actor::smp::count;
+                if constexpr (is_unlimited_concurrent_local_actor<Actor>::value) {
+                    next = (Actor::round_robin_counter++ + engine().cpu_id()) % smp::count;
                 } else {
-                    next = (Actor::round_robin_counter++ + nil::actor::engine().cpu_id()) %
-                           (nil::actor::smp::count < Actor::max_activations ? nil::actor::smp::count :
-                                                                              Actor::max_activations);
+                    next = (Actor::round_robin_counter++ + engine().cpu_id()) %
+                           (smp::count < Actor::max_activations ? smp::count : Actor::max_activations);
                 }
 
                 return detail::do_with_actor_ref_impl<Actor, detail::ActorKey<Actor>>(
