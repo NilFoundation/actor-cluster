@@ -29,7 +29,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <nil/actor/core/app-template.hh>
+#include <nil/actor/core/app_template.hh>
 #include <nil/actor/core/print.hh>
 #include <nil/actor/cluster/cluster.hpp>
 #include <nil/actor/core/sleep.hh>
