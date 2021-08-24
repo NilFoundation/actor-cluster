@@ -1,7 +1,5 @@
 # =nil; Actor Virtual Actor Model Library
 
-[![Licence](https://img.shields.io/github/license/HippoBaro/ultramarine.svg?color=%23120a8f&style=for-the-badge)](https://github.com/nilfoundation/actor-cluster/blob/master/LICENSE)
-
 =nil; Actor is a lightweight modern actor library built on top of
 the [=nil; Actor.Core Library](https://github.com/nilfoundation/actor-core). It helps writing distributed applications
 using virtual actors. It allows developers to write highly scalable applications while greatly simplifying discovery,
@@ -13,30 +11,9 @@ state and execution context) share and process information by exchanging message
 
 It is heavily inspired by the [Microsoft Orleans](https://dotnet.github.io/orleans/Documentation/index.html) project.
 
-# Installation
-
-Ultramarine is built upon [=nil; Actor.Core Library](https://github.com/nilfoundation/actor-core) and share the same
-dependencies. Actor provides a convenience script to pull all necessary packages (`install-dependencies.sh`).
-
-To pull Actor and configure Ultramarine:
-
-```
-./cooking.sh -t Release
-```
-
-To build the examples:
-
-```
-ninja -C build
-```
-
-# Documentation
-
-Various guides, examples and API reference are [available here](https://hippobaro.github.io/ultramarine/).
-
 # Code Example
 
-First we need to define an [`actor`](https://hippobaro.github.io/ultramarine/api/doc_ultramarine__actor/):
+First we need to define an `actor`:
 
 ```cpp
 class hello_actor : public nil::actor::actor<hello_actor> {
@@ -52,37 +29,28 @@ public:
 };
 ```
 
-And then call the actor activation from anywhere in your seastar code using
-an [`actor_ref`](https://hippobaro.github.io/ultramarine/api/doc_ultramarine__actor_ref#standardese-ultramarine__actor_ref-Actor-):
+And then call the actor activation from anywhere in your actor code using
+an `actor_ref`:
 
 ```cpp
-auto ref = nil::actor::get<hello_actor>("Ultramarine");
+auto ref = nil::actor::get<hello_actor>("actor");
 auto future = ref->say_hello();
 // wait or attach a continuation to the returned future.
 ```
 
 # Performance
 
-Ultramarine is built on Actor and benefits from a
-lock-free, [shared-nothing design](http://seastar.io/shared-nothing/). Compared to typical actor model implementations,
+=nil; Actor is built on Actor and benefits from a
+lock-free, shared-nothing design. Compared to typical actor model implementations,
 it doesn't use any locking or complex cache-unfriendly concurrent data-structures internally.
 
-Specifically, this gives Ultramarine an advantage on many-to-many communication patterns, because there is no contention
-on mailboxes. Also, because Ultramarine doesn't have per-actor mailboxes and actor' messages aren't processed in
+Specifically, this gives =nil; Actor an advantage on many-to-many communication patterns, because there is no contention
+on mailboxes. Also, because =nil; Actor doesn't have per-actor mailboxes and actor' messages aren't processed in
 batches, it has better latency characteristics.
-
-As an example see how it compares against other popular actor libraries on
-the [Big actor benchmark](http://release.softlab.ntua.gr/bencherl/files/erlang01-aronis.pdf):
-
-Mean Execution Time        | Standard deviation
----------------------------|--------------------
-![](https://hippobaro.github.io/ultramarine/assets/big_met.png)    | ![](https://hippobaro.github.io/ultramarine/assets/big_std.png)
-
-More information and benchmarks are [available here](https://hippobaro.github.io/ultramarine/benchmarks).
 
 # Going forward
 
-Ultramarine is a small project and currently lacks:
+=nil; Actor is a small project and currently lacks:
 
 - [ ] **Clustering.** An actor system on a local machine is nice, but the concept shines when actors are allowed to
   migrate across a set of clustered machines freely.
@@ -95,4 +63,4 @@ Ultramarine is a small project and currently lacks:
 
 # License
 
-This project is licensed under the [MIT license](https://github.com/HippoBaro/ultramarine/blob/master/LICENSE).
+This project is licensed under the [MIT license](https://github.com/nilfoundation/actor-cluster/blob/master/LICENSE).
